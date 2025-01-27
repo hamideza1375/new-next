@@ -1,0 +1,50 @@
+// وارد کردن ماژول های مورد نیاز
+import authAdminRoutes from '@/middleware/authAdminRoutes';
+import { ProductsModel } from '@/models/ProductModel';
+import dbConnect from '@/utils/dbConnect';
+import { NextRequest, NextResponse as res } from 'next/server';
+
+/** @param {NextRequest} req * @param {() => void} * @param {res} res * @param {() => void} */
+
+// تابع برای به روز رسانی محصول
+export async function PUT(req) {
+    try {
+        // اتصال به دیتابیس
+        await dbConnect();
+        // احراز هویت ادمین
+        await authAdminRoutes(req);
+        // دریافت نسخه جدید از درخواست
+        const {version} = await req.json()
+
+        // پیدا کردن محصول با استفاده از شناسه محصول
+        const product = await ProductsModel.findById(req.nextUrl.searchParams.get('productID'));
+        // به روز رسانی نسخه محصول
+        product.version = version
+        // ذخیره تغییرات
+        await product.save();
+        // بازگشت پاسخ موفقیت آمیز
+        return Response.json({ message: 'تغییرات ذخیره شد', dt:product }, { status: 200 });
+    } catch (error) {
+        // ثبت خطا در کنسول
+        console.log(error);
+        // بازگشت پاسخ خطا
+        return Response.json(error?.message, { status: (error && error.status) || 500 });
+    }
+}
+
+// تابع برای دریافت نسخه محصول
+export async function GET(req) {
+    try {
+        // اتصال به دیتابیس
+        await dbConnect();
+        // احراز هویت ادمین
+        await authAdminRoutes(req);
+        // پیدا کردن محصول با استفاده از شناسه محصول و انتخاب فقط فیلد نسخه
+        const product = await ProductsModel.findById(req.nextUrl.searchParams.get('productID')).select('version');
+        // بازگشت نسخه محصول
+        return Response.json(product.version)
+    } catch (error) {
+        // بازگشت پاسخ خطا
+        return Response.json(error?.message, { status: (error && error.status) || 500 });
+    }
+}

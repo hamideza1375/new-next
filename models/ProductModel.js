@@ -110,9 +110,7 @@ const ProductsSchema = new mongoose.Schema({
     offer: { type: Object, default: { exp: 0, value: 0 } },
 
     comments: [CommenteSchema],
-
     parts: [PartSchema],
-    createAt: { type: Date, default: Date.now },
     seller: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Seller',

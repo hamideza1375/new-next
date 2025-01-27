@@ -15,6 +15,10 @@ const PaymentSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    },
     status: {
         type: String,
         enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
@@ -24,6 +28,6 @@ const PaymentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'OrderItem'
     }]
-});
+},{timeStamp:true});
 
 export const PaymentsModel = mongoose.models.payment || mongoose.model('payment', PaymentSchema);

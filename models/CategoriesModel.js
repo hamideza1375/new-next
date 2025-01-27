@@ -23,18 +23,6 @@ const categorySchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    // متادیتا برای SEO
-    metaTitle: {
-        type: String,
-        trim: true
-    },
-    metaDescription: {
-        type: String,
-        trim: true
-    },
-    metaKeywords: {
-        type: [String]
-    }
 },{timeStamp:true});
 
 export const CategoriesModel = mongoose.models.category || mongoose.model('category', categorySchema);

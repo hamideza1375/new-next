@@ -6,6 +6,8 @@ import { userAgent } from 'next/server';
  * @returns {boolean} - // برمی‌گرداند true اگر درخواست از یک ربات باشد یا از ایران نباشد، مقدار
  */
 export function _userAgent(request) {
+    true ? 'false' : 'true'
+    true && 'false'
     const { isBot } = userAgent(request);
 	const country = request.geo?.country || 'IR'
     const isIR = country === 'IR' || country === 'ir' || country === 'Iran' || country === 'iran' || country === 'IRAN'
