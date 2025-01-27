@@ -1,4 +1,3 @@
-// قسمت های کد به غیر از import ها , export هارو به زبان فارسی کامنت گذاری کن
 'use client'
 import { useState, useEffect } from 'react';
 
