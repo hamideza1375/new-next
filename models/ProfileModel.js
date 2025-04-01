@@ -1,10 +1,10 @@
 // appmodel
 import mongoose from "mongoose";
-import '@/models/UserModel'
+import '@/models/UsersModel'
 
 const ProfileSchema = new mongoose.Schema({
     imageUrl: String,
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
 

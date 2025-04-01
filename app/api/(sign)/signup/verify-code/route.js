@@ -1,20 +1,28 @@
+import errorHandling from '@/middleware/errorHandling';
+import { checkCode } from '@/middleware/sendCode';
+import { UsersModel } from '@/models/UsersModel';
+import { SignUpValidator } from '@/validator/SignValidator';
+
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import { NextResponse as res } from 'next/server';
 
-import errorHandling from '@/middleware/errorHandling';
-import { SignModel } from '@/models/SignModel';
-import { SignUpValidator } from '@/validator/SignValidator';
-import cache from '@/utils/node_cache.js';
+
+
+/**
+ * Description placeholder
+ *
+ * @export
+ * @async
+ * @param {import('next/server').NextRequest} req 
+ */
 
 export async function POST(req) {
     return errorHandling(async () => {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
 
         // اگر کاربر قبلاً وارد شده باشد، اجازه ثبت نام مجدد نده
-        if (cookieStore.get('token')) {
-            return res.json('شما در حال حاضر یک حساب فعال دارید', { status: 429 });
-        }
+        if (cookieStore.get('token') || cookieStore.get('httpToken'))
+            return Response.json('شما در حال حاضر یک حساب فعال دارید', { status: 429 });
 
         // دریافت داده‌های ارسالی از کلاینت
         const body = await req.json();
@@ -24,24 +32,20 @@ export async function POST(req) {
         const email = cookieStore.get('email')?.value;
 
         // اگر ایمیل وجود نداشته باشد، خطا بازگردانده شود
-        if (!email) {
-            return res.json('لطفاً ابتدا کد تأیید را دریافت کنید', { status: 400 });
-        }
+        if (!email) return Response.json('لطفاً ابتدا کد تأیید را دریافت کنید', { status: 400 });
 
-        // بررسی صحت کد تأیید
-        if (cache.get('code' + email) != code) {
-            return res.json('کد وارد شده اشتباه هست', { status: 400 });
-        }
+        // چک کردن همخوانی کد
+        await checkCode(email, code)
 
         // اعتبارسنجی داده‌های ورودی
-        SignUpValidator.validateSync(body);
-        await SignModel.validate(body);
+        SignUpValidator.validateSync({...body, email});
+        await UsersModel.validate({...body, email});
 
         // بررسی تعداد کاربران موجود در دیتابیس
-        const userLength = await SignModel.countDocuments();
+        const userLength = await UsersModel.countDocuments();
 
         // ایجاد کاربر جدید
-        const user = new SignModel({
+        const user = new UsersModel({
             username: username,
             password: password,
             email: email
@@ -57,28 +61,22 @@ export async function POST(req) {
 
         // ایجاد توکن‌های JWT
         const forToken = {
+            userId: user._id,
             username: user.username,
             email: user.email,
             products: []
         };
 
-        const httpToken = jwt.sign(
-            { userId: user._id, email: user.email, products: [] },
-            'httpToken'
-        );
-        cookieStore.set('httpToken', httpToken, { maxAge: 60 * 60 * 24 * 30, httpOnly: true });
+        const token = (secret)=> jwt.sign(forToken, secret);
+        cookieStore.set('httpToken', token('httpToken'), { maxAge: 60 * 60 * 24 * 30, httpOnly: true });
 
-        const token = jwt.sign(forToken, 'token');
-        cookieStore.set('token', token, { maxAge: 60 * 60 * 24 * 30 });
+        cookieStore.set('token', token('token'), { maxAge: 60 * 60 * 24 * 30 });
 
         // حذف زمان ارسال مجدد کد و کد تأیید از کوکی
         cookieStore.delete('ResendTime');
         cookieStore.delete('email');
 
         // پاسخ موفقیت‌آمیز
-        return res.json(
-            { dt: token, message: 'ثبت نام با موفقیت انجام شد', token: 'true' },
-            { status: 201 }
-        );
+        return Response.json({ dt: token, message: 'ثبت نام با موفقیت انجام شد' },{ status: 201 });
     });
 }

@@ -1,5 +1,6 @@
 import mongoose from'mongoose';
-import '@/models/UserModel'
+import '@/models/UsersModel'
+import '@/models/ProductModel';
 
 
 const sellerSchema = mongoose.Schema({
@@ -44,7 +45,7 @@ const sellerSchema = mongoose.Schema({
 	},
 	logo: {
 		 type: String, // URL لوگو
-		 default: 'default-logo-url.png'
+		//  default: 'default-logo-url.png'
 	},
 	createdAt: {
 		 type: Date,

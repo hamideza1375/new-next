@@ -1,7 +1,8 @@
+import errorHandling from '@/middleware/errorHandling';
+import rateLimit from '@/middleware/rateLimit';
+import { UsersModel } from '@/models/UsersModel';
 import jwt from 'jsonwebtoken';
 import { NextResponse as res } from 'next/server';
-
-import errorHandling from '@/middleware/errorHandling';
 
 export async function POST(req) {
 
@@ -11,12 +12,12 @@ export async function POST(req) {
         const { email, password } = body;
 
         // جستجوی کاربر در دیتابیس بر اساس ایمیل
-        const user = await SignModel.findOne({ email }).select('-password').lean()
+        // const user = await UsersModel.findOne({ email }).lean()
+        const user = await UsersModel.findOne({ email }).select('-password').lean()
 
         // اگر کاربر وجود نداشته باشد، خطا بازگردانده شود
-        if (!user) {
+        if (!user)
             return res.json({ message: 'مشخصات اشتباه هست' }, { status: 400 });
-        }
 
         // استفاده از middleware محدودیت نرخ درخواست (Rate Limit)
         return rateLimit(async () => {

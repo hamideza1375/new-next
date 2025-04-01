@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
-import cache from '../utils/node_cache.js';
+import cache from '@/utils/node_cache.js';
+import { cookies } from 'next/headers';
 
-export default function sendCode(to, path = '') {
+function production_sendCode(to, path = '') {
     return new Promise((resolve, reject) => {
         // تولید یک کد تصادفی
         const random = Math.floor(Math.random() * 90000 + 1000);
@@ -47,9 +48,53 @@ jslearn.ir ارسال از
                     cache.del('code' + to);
                     reject('مشکلی پیش آمد اتصال اینترنت را برسی کنید');
                 } else {
-                    resolve({ message: 'کد دریافتی را وارد کنید', dt: 'code' });
+                    resolve({ message: 'کد دریافتی را وارد کنید', data: 'code' });
                 }
             }
         );
     });
 }
+
+//////////////////
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+/**
+ * Description placeholder
+ *
+ * @export
+ * @param {string} [to='']
+ * @param {string} [path='']
+ */
+export default function sendCode(to = '', path = '') {
+    return new Promise(async (resolve, reject) => {
+        if (isProduction) {
+            await production_sendCode(to, path);
+        } else {
+            const cookieStore = await cookies();
+            cookieStore.set('code' + to, 12345, { maxAge: 180 });
+            resolve({ message: '12345 را به عنوان کد وارد کنید', data: 'code' });
+        }
+    });
+}
+
+/**
+ * Description placeholder
+ *
+ * @param {string} to
+ * @param {number} code
+ */
+export const checkCode = (to, code) => {
+    return new Promise(async (resolve, reject) => {
+        if (isProduction) {
+            if (cache.get('code' + to) != code) reject({ message: 'کد وارد شده اشتباه هست', status: 400 })
+            else resolve();
+            
+        } else {
+            const cookieStore = await cookies();
+            if (cookieStore.get('code' + to)?.value != code) reject({ message: 'کد وارد شده اشتباه هست', status: 400 });
+            else resolve();
+            
+        }
+    });
+};

@@ -1,5 +1,4 @@
-// وارد کردن مدل کاربر و توابع مورد نیاز
-import { SignModel } from '@/models/UserModel';
+import { UsersModel } from '@/models/UsersModel';
 import { decode } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
@@ -17,9 +16,9 @@ export default async function authAdminRoutes() {
         // بررسی دسترسی ادمین
         if (!user.payload.isAdmin || !httpUser.payload.isAdmin) reject({ message: 'شما اجازه ی دسترسی ندارید', status: 403 });
         // یافتن کاربر در پایگاه داده
-        const usermodel = await SignModel.findById(httpUser.payload.userId);
+        const UserModel = await UsersModel.findById(httpUser.payload.userId);
         // بررسی دسترسی ادمین در پایگاه داده
-        if (!usermodel?.isAdmin) reject({ message: 'شما اجازه ی دسترسی ندارید', status: 403 });
+        if (!UserModel?.isAdmin) reject({ message: 'شما اجازه ی دسترسی ندارید', status: 403 });
         // تایید دسترسی
         resolve(httpUser.payload);
     });

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import '@/models/UserModel'
+import '@/models/UsersModel'
 
 const PaymentSchema = new mongoose.Schema({
     representative: { type: mongoose.Schema.Types.ObjectId },

@@ -1,4 +1,4 @@
-import { SignModel } from '@/models/UserModel';
+import { UsersModel } from '@/models/UsersModel';
 import { decode } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
@@ -14,10 +14,10 @@ export default async function authSeller() {
         if (!user || !httpUser) reject({ message: 'ابتدا وارد حساب خود شوید', status: 401 });
         
         // پیدا کردن کاربر در دیتابیس با استفاده از آی‌دی
-        const usermodel = await SignModel.findById(httpUser.payload.userId);
+        const UserModel = await UsersModel.findById(httpUser.payload.userId);
         
         // بررسی اینکه کاربر فروشنده است یا خیر
-        if (!usermodel?.sellerId) reject({ message: 'شما اجازه ی دسترسی ندارید', status: 403 });
+        if (!UserModel?.sellerId) reject({ message: 'شما اجازه ی دسترسی ندارید', status: 403 });
         
         // بازگرداندن اطلاعات کاربر
         resolve(httpUser.payload);

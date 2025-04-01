@@ -1,36 +1,35 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse as res } from 'next/server';
-import { SignModel } from '@/models/SignModel';
+import { UsersModel } from '@/models/UsersModel';
 import sendCode from '@/middleware/sendCode';
 import errorHandling from '@/middleware/errorHandling';
+import { CustomError } from '@/utils/CustomError';
 
 /** @param {NextRequest} req * @param {() => void} */
 
 export async function POST(req) {
+    console.log(1234555);
+    
     return errorHandling(async () => {
 
-        console.log(req.url);
-        console.log(req.nextUrl);
-        
+       throw new CustomError({message: 'send-code-filed', status: 400})
 
-
-        const cookieStore = cookies();
+        // const cookieStore = cookies();
+        const cookieStore = await cookies()
 
         // اگر کاربر قبلاً وارد شده باشد، اجازه ارسال کد نده
-        if (cookieStore.get('token')) {
+        if (cookieStore.get('token') || cookieStore.get('httpToken')) {
             return res.json('شما در حال حاضر یک حساب فعال دارید', { status: 429 });
         }
 
         // دریافت ایمیل از بدنه درخواست
         const { email } = await req.json();
 
-        // بررسی وجود کاربر با ایمیل ارسالی (با پروجکشن فقط فیلد _id دریافت می‌شود)
-        const user = await SignModel.findOne({ email }).select('_id').lean();
+        // دریافت می‌شود) _id بررسی وجود کاربر با ایمیل ارسالی (با پروجکشن فقط فیلد
+        const user = await UsersModel.findOne({ email }).select('_id').lean();
 
         // اگر کاربر با این ایمیل وجود داشته باشد
-        if (user) {
-            return res.json('شما قبلاً ثبت‌نام کرده‌اید', { status: 400 });
-        }
+        if (user) { return res.json('شما قبلاً ثبت‌نام کرده‌اید', { status: 400 });}
 
         // اگر زمان ارسال مجدد کد فعال باشد، خطا بازگردانده شود
         if (cookieStore.get('ResendTime')) {
@@ -39,7 +38,7 @@ export async function POST(req) {
 
 
         // ارسال کد تأیید
-            const response = await sendCode(email,req.url);
+            const response = await sendCode(email, req.url);
 
             // تنظیم زمان ارسال مجدد کد (۳ دقیقه)
             const creationTime = Date.now();

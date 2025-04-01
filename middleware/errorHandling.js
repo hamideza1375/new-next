@@ -33,7 +33,7 @@ export default async function errorHandling(call) {
         const { file, line } = getFileAndLineFromStack(error.stack || '');
 
         // برای نمایش رنگی در کنسول util.inspect فرمت‌بندی خطا با استفاده از
-        const errorMessage = util.inspect(error, {
+        const errorMessage = (error) => util.inspect(error, {
             colors: true,
             depth: null,
         });
@@ -54,8 +54,8 @@ export default async function errorHandling(call) {
         });
 
         // نمایش خطا در کنسول به صورت رنگی
-        console.error(`Error in file: ${file}, line: ${line}`);
-        console.error(errorMessage);
+        console.error(errorMessage(error.message));
+        console.error(errorMessage(error.split('')));
 
         // بررسی وجود حروف فارسی در پیام خطا و ارسال پاسخ مناسب
         if (hasPersianLetters(error?.message)) {

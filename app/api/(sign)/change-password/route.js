@@ -1,10 +1,9 @@
-/*************  ✨ Codeium Command 🌟  *************/
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 
 import errorHandling from '@/middleware/errorHandling';
 import sendCode, { checkCode } from '@/middleware/sendCode';
-import { SignModel } from '@/models/SignModel';
+import { UsersModel } from '@/models/UsersModel';
 import cache from '@/utils/node_cache.js';
 
 /**
@@ -21,7 +20,7 @@ export async function POST(req) {
     if (cookieStore.get('ResendTime')) return Response.json('تا اتمام سه دقیقه صبر کنید', { status: 429 });
 
     const { email, password } = await req.json();
-    const user = await SignModel.findOne({ email }).select('_id').lean();
+    const user = await UsersModel.findOne({ email }).select('_id').lean();
 
     if (!user) return Response.json('ایمیل وارد شده اشتباه هست', { status: 400 });
     // ایمیل و گذرواژه جدید را در کوکی ها ذخیره می کنیم
@@ -57,7 +56,7 @@ export async function PUT(req) {
     // اگر کد وارد شده صحیح نباشد، خطا می دهیم
     await checkCode(code, cookieStore.get('email').value);
 
-    const user = await SignModel.findOne({ email: cookieStore.get('email').value });
+    const user = await UsersModel.findOne({ email: cookieStore.get('email').value });
     user.password = cookieStore.get('password').value;
     await user.save();
 

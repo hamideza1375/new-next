@@ -1,0 +1,32 @@
+/* @media (max-width: 767px) and (orientation: portrait) { */
+	.video::-webkit-media-controls {
+		display: flex;
+		justify-content: center;
+	}
+	
+	.video::-webkit-media-controls-panel {
+		box-sizing: border-box;
+		margin-top: auto;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		border-radius: 4px;
+		background-image: linear-gradient(#000e, #222d);
+		transform: scale(1, 0.8);
+		margin-bottom: -6px;
+	}
+	
+	.video::-webkit-media-controls-enclosure {
+		width: 100%;
+		min-height: 100%;
+		background-color: transparent;
+		-moz-border-radius: 1px !important;
+		-webkit-border-radius: 1px !important;
+		border-radius: 1px !important;
+		overflow: hidden;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}

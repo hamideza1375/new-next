@@ -1,5 +1,5 @@
 import mongoose from'mongoose';
-import '@/models/UserModel'
+import '@/models/UsersModel'
 
 
 const AnswerTicketSchema = new mongoose.Schema({
@@ -11,7 +11,6 @@ const AnswerTicketSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	 },
-	 // تاریخ به‌روزرسانی تیکت
 	 updatedAt: {
 		type: Date,
 		default: Date.now,
@@ -24,7 +23,7 @@ const TicketSchema = new mongoose.Schema({
 	message: { type: String,/*  require: true, minlength: 1 */ },
 	image: { type: String },
 	answer: [AnswerTicketSchema],
-	userId: { type: mongoose.Schema.Types.ObjectId, ref:'User' },
+	user: { type: mongoose.Schema.Types.ObjectId, ref:'User' },
 	userSeen: { type: Number, default: 1 },
 	adminSeen: { type: Number, default: 0 },
 	category: {

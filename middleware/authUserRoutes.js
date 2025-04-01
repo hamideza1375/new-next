@@ -1,5 +1,4 @@
-// وارد کردن مدل کاربر و توابع مورد نیاز
-import { SignModel } from '@/models/UserModel';
+import { UsersModel } from '@/models/UsersModel';
 import { decode } from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 
@@ -17,11 +16,11 @@ export default async function authUserRoutes() {
             return reject({ message: 'ابتدا وارد حساب خود شوید', status: 401 });
         
         // پیدا کردن کاربر با استفاده از آی‌دی
-        const usermodel = await SignModel.findById(httpToken.payload.userId);
+        const UserModel = await UsersModel.findById(httpToken.payload.userId);
         
         // بررسی نوع داده و وضعیت حساب کاربر
-        if (typeof usermodel !== 'object') reject({ message: 'ابتدا وارد حساب خود شوید', status: 401 });
-        if ((usermodel?.blocked)) reject({ message: 'حساب شما مسدود شده لطفا از طریق تیکت پیگیری کنید', status: 401 });
+        if (typeof UserModel !== 'object') reject({ message: 'ابتدا وارد حساب خود شوید', status: 401 });
+        if ((UserModel?.blocked)) reject({ message: 'حساب شما مسدود شده لطفا از طریق تیکت پیگیری کنید', status: 401 });
         
         // بازگرداندن اطلاعات توکن
         resolve(httpToken.payload);
