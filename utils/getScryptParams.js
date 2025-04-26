@@ -1,5 +1,25 @@
 import os from 'os';
 
+/**
+ * تابع تنظیم پارامترهای الگوریتم scrypt بر اساس منابع سیستم
+ * 
+ * @function getScryptParams
+ * @description این تابع منابع سیستم (حافظه) را بررسی کرده و پارامترهای بهینه
+ * برای الگوریتم هش‌سازی scrypt را محاسبه می‌کند. این کار برای اطمینان از عملکرد
+ * بهینه سیستم در شرایط مختلف سخت‌افزاری انجام می‌شود.
+ * 
+ * @property {number} N - پارامتر هزینه حافظه (تعداد تکرارها)
+ * @property {number} r - پارامتر اندازه بلوک
+ * @property {number} p - پارامتر موازی‌سازی
+ * @returns {{ N, r, p }} شیء حاوی پارامترهای بهینه‌شده scrypt
+ * 
+ * @example
+ * // دریافت پارامترهای بهینه‌شده
+ * const { N, r, p } = getScryptParams();
+ * // استفاده در الگوریتم scrypt
+ * const hash = await scrypt(password, salt, { N, r, p });
+ */
+
 // تابع برای بررسی منابع سیستم و تنظیم پارامترهای scrypt
 export function getScryptParams() {
     const totalMemoryGB = os.totalmem() / 1024 / 1024 / 1024; // کل حافظه سیستم به گیگابایت

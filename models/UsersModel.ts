@@ -1,10 +1,29 @@
 import '@/models/SellerModel';
 import { CustomError } from '@/utils/CustomError';
 import crypto from 'crypto';
-import mongoose from "mongoose";
+import mongoose, { Schema, Model, Document } from "mongoose";
 import { getScryptParams } from '@/utils/getScryptParams';
 
-const userSchema = new mongoose.Schema({
+// Interface for User document
+interface IUser extends Document {
+    username?: string;
+    email: string;
+    phone?: string;
+    password: string;
+    isAdmin?: number;
+    seller?: mongoose.Types.ObjectId;
+    products?: any[];
+    blocked?: number;
+    address?: string;
+    city?: string;
+    postalCode?: string;
+    latlng?: object;
+    lastLogin?: Date;
+    passwordChangedAt?: Date;
+    comparePassword(candidatePassword: string): Promise<void>;
+}
+
+const userSchema: Schema<IUser> = new mongoose.Schema({
     username: { type: String, minlength: 3 },
     email: {
         type: String,
@@ -18,7 +37,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         sparse: true,
         validate: {
-            validator: function (v) {
+            validator: function (v: string) {
                 return /\d{11}/.test(v);
             },
             message: 'شماره تلفن باید ۱۱ رقم باشد',
@@ -30,9 +49,9 @@ const userSchema = new mongoose.Schema({
         minlength: [6, 'رمز عبور باید حداقل ۶ کاراکتر باشد'],
         select: false
     },
-    isAdmin: { type: Number, required: false, /* unique: true, */ sparse: true },
+    isAdmin: { type: Number, required: false, sparse: true },
     seller: { type: mongoose.Schema.Types.ObjectId, ref: 'Seller' },
-    products: { type: Array, default: [] },
+    products: { type: Array, default: [{productId:'', version:''}] },
     blocked: { type: Number, default: 0 },
     address: {
         type: String,
@@ -46,14 +65,6 @@ const userSchema = new mongoose.Schema({
         maxlength: 10
     },
     latlng: { type: Object },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
-    },
     lastLogin: Date,
     passwordChangedAt: Date,
 }, { timestamps: true });
@@ -63,7 +74,7 @@ const { N, r, p } = getScryptParams();
 const keyLength = 64; // طول کلید هش شده (بر حسب بایت)
 
 // pre-save hook برای هش کردن رمز عبور
-userSchema.pre('save', function (next) {
+userSchema.pre<IUser>('save', function (next: (err?: Error) => void) {
     if (!this.isModified('password')) return next();
     const salt = crypto.randomBytes(16).toString('hex'); // سالت تصادفی
     crypto.scrypt(this.password, salt, keyLength, { N, r, p }, (err, derivedKey) => {
@@ -76,10 +87,10 @@ userSchema.pre('save', function (next) {
 });
 
 
-userSchema.methods.comparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<void> {
     const [salt, hashedPassword] = this.password.split(':'); // جدا کردن سالت و هش ذخیره شده
     try {
-        const derivedKey = await new Promise((resolve, reject) => {
+        const derivedKey = await new Promise<string>((resolve, reject) => {
             crypto.scrypt(candidatePassword, salt, keyLength, { N, r, p }, (err, derivedKey) => {
                 if (err) reject(err);
                 resolve(derivedKey.toString('hex'));
@@ -96,7 +107,7 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 
-userSchema.post('save', function (error, doc, next) {
+userSchema.post('save', function (error: any, doc: IUser, next: (err?: Error) => void) {
     if (error.code === 11000) {
         next(new CustomError({message:'این ایمیل یا تلفن قبلاً استفاده شده است', status: 409}));
     } else {
@@ -104,4 +115,5 @@ userSchema.post('save', function (error, doc, next) {
     }
 });
 
-export const UsersModel = mongoose.models?.User || mongoose.model('User', userSchema);
+
+export const UsersModel: Model<IUser> = mongoose.models?.User || mongoose.model<IUser>('User', userSchema);

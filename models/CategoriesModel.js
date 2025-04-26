@@ -15,14 +15,14 @@ const categorySchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    },
-},{timeStamp:true});
+    // createdAt: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+    // updatedAt: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+},{timestamps:true});
 
 export const CategoriesModel = mongoose.models.category || mongoose.model('category', categorySchema);

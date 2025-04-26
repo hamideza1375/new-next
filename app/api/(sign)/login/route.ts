@@ -1,0 +1,89 @@
+import rateLimit from '@/middleware/rateLimit';
+import sendCode from '@/middleware/sendCode';
+import { UsersModel } from '@/models/UsersModel';
+import jwt from 'jsonwebtoken';
+import { type NextRequest, NextResponse as res } from 'next/server';
+
+interface RequestBody {
+    email: string;
+    password: string;
+}
+
+interface UserToken {
+    sellerId?: string;
+    userId?: string;
+    username?: string;
+    email: string;
+    products?: any[];
+}
+
+interface AdminResponse {
+    message: string;
+}
+
+export async function POST(req: NextRequest) {
+        return rateLimit(async () => {
+        // دریافت داده‌های ارسالی از کلاینت
+        const body: RequestBody = await req.json();
+        const { email, password } = body;
+
+        // جستجوی کاربر در دیتابیس بر اساس ایمیل
+        const user = await UsersModel.findOne({ email }).select('-password').lean();
+
+        // اگر کاربر وجود نداشته باشد، خطا بازگردانده شود
+        if (!user) {
+            return res.json({ message: 'مشخصات اشتباه هست' }, { status: 400 });
+        }
+
+        // استفاده از middleware محدودیت نرخ درخواست (Rate Limit)
+            // بررسی صحت رمز عبور
+            await user.comparePassword(password);
+
+            // اگر کاربر ادمین نباشد
+            if (!user.isAdmin) {
+                
+                // ایجاد توکن برای کاربر عادی
+                const forUserToken: UserToken = {
+                    ...(user.seller && { sellerId: user.seller.toString() }),
+                    userId: user._id.toString(),
+                    username: user.username,
+                    email: user.email,
+                    products: user.products
+                };
+
+
+                // ایجاد توکن اصلی برای کوکی
+                const token = jwt.sign(forUserToken, 'token');
+                const httpToken = jwt.sign(forUserToken, 'httpToken');
+                
+
+                // send response
+                const response = res.json(
+                    { dt: token, message: {}, token: 'true' }, 
+                    { status: 200 }
+                );
+                
+                // set cookies
+                response.cookies.set('token', token, { 
+                    maxAge: 60 * 60 * 24 * 30 
+                });
+
+                // set http cookies
+                response.cookies.set('httpToken', httpToken, { 
+                    maxAge: 60 * 60 * 24 * 30, 
+                    httpOnly: true 
+                });
+
+                return response;
+            }
+            // اگر کاربر ادمین باشد
+            else {
+                // ارسال کد تأیید به ایمیل مدیر
+                const response: AdminResponse = await sendCode(email, req.url);
+
+                // پاسخ با کد تأیید ارسال شده
+                return res.json(response);
+            }
+
+    });
+}

@@ -3,7 +3,7 @@ import { fontSans } from '@/config/fonts';
 import { cn } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useSidebarContext } from '../layout/layout-context';

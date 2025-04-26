@@ -4,7 +4,7 @@ import { FilmIcon } from '@heroicons/react/24/solid';
 import { cn } from '@nextui-org/react';
 import { useState } from 'react';
 
-export const FileInput2 = ({ setFile, defaultValue, mediaType, select, className, label, Icon, setTime }) => {
+export const FileInput = ({ setFile, defaultValue, mediaType, select, className, label, Icon, setTime }) => {
     const [_file, _setFile] = useState('');
 
     return (

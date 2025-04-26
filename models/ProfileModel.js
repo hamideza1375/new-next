@@ -5,7 +5,7 @@ import '@/models/UsersModel'
 const ProfileSchema = new mongoose.Schema({
     imageUrl: String,
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
-});
+},{timestamps: true});
 
 
 export const ProfileModel = mongoose.models?.profile || mongoose.model('profile', ProfileSchema);

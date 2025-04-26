@@ -1,7 +1,4 @@
-import {
-    Vazirmatn,
-    Shantell_Sans,
-} from 'next/font/google';
+import { Vazirmatn, Shantell_Sans } from 'next/font/google';
 
 export const fontVazir = Vazirmatn({
     subsets: ['arabic'],

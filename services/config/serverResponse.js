@@ -10,10 +10,16 @@ export const serverResponse = () => {
         toast.error(typeof error === 'string' ? error : 'خطایی غیر منتظره رخ داد');
     };
     var toast401 = error => {
-        toast.warning(typeof error === 'string' ? error : 'عدم دسترسی');
+        toast.error(typeof error === 'string' ? error : 'عدم دسترسی');
     };
     var toast404 = () => {
         toast.error('مسیر پیدا نشد');
+    };
+    let toast429 = error => {
+        toast.error(((typeof error === 'string' && error) || (typeof error?.message === 'string' && error.message)) || 'بیش از حد تلاش کردید');
+    };
+    var otherErrors = error => {
+        toast.error(typeof error === 'string' ? error : 'مشکلی پیش آمد');
     };
     var toast500 = () => {
         toast.error('خطا ی سرور', 'مشکلی از سمت سرور پیش آمده');
@@ -23,11 +29,7 @@ export const serverResponse = () => {
     };
     Axios.interceptors.response.use(
         function (response) {
-            const {
-                status,
-                config,
-                data,
-            } = response;
+            const { status, config, data } = response;
             if (
                 config.method !== 'get' &&
                 (status === 200 || status === 201 || status === 'ok' || status === 'OK')
@@ -50,7 +52,11 @@ export const serverResponse = () => {
                     // forbidden();
                 } else if (response.status === 404) {
                     toast404();
-                } else if (response.status > 404 && response.status <= 500) {
+                } else if (response.status === 429) {
+                    toast429(response.data);
+                } else if (response.status > 404 && response.status <= 429) {
+                    otherErrors(response.data);
+                } else if (response.status > 429 && response.status <= 500) {
                     toast500();
                 }
             }

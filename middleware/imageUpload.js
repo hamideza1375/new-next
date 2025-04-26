@@ -1,66 +1,39 @@
-import { headers } from 'next/headers';
 import sharp from 'sharp';
 
-export default function optimizeImage(image) {
+
+/**
+ * تابع بهینه‌سازی و ذخیره تصویر گواهی
+ * 
+ * @description این تابع تصاویر گواهی را دریافت کرده، آن‌ها را به فرمت بهینه تبدیل می‌کند و ذخیره می‌نماید.
+ * تصاویر خروجی با فرمت webp و با نام منحصر به فرد ذخیره می‌شوند.
+ * 
+ * @param {File} image - شیء فایل تصویر ورودی
+ * @returns {Promise<string|null>} Promise که در صورت موفقیت با نام فایل resolve می‌شود
+ * یا در صورت خطا reject می‌شود. اگر تصویر معتبر نباشد null برمی‌گرداند.
+ * 
+ * @throws {Object} خطاهای پردازش تصویر:
+ * @throws {Object} 400 - اگر عملیات آپلود و پردازش تصویر با خطا مواجه شود
+ */
+
+// تابعی برای بهینه سازی تصویر گواهی
+export default function imageUpload(image) {
+    // بررسی می کند که آیا تصویر دارای اندازه است یا خیر
     if (image?.size) {
         return new Promise(async (resolve, reject) => {
-            const _headers = headers();
-
-            let fileDir;
-            // بررسی مسیر ارجاع دهنده برای تعیین دایرکتوری فایل
-            if (_headers.get('referer').includes('tickets')) fileDir = process.cwd() + '/assets/uploads/ticket/';
-            else if (_headers.get('referer').includes('questions'))
-                fileDir = process.cwd() + '/assets/uploads/question/';
-
+            // مسیر دایرکتوری فایل
+            let fileDir = process.cwd() + '/assets/uploads/certificate/';
             try {
+                // تبدیل تصویر به بافر
                 let buffer = Buffer.from(await image.arrayBuffer());
-                // تولید نام فایل به صورت تصادفی
-                let filename =
-                    Date.now().toString('32') + '' + Math.floor(Math.random() * 999999 + 100000) + '.webp';
-                const sharpImage = sharp(buffer);
-
-                const { width, height, format, size } = await sharpImage.metadata();
-
-                // بررسی اندازه تصویر و انجام عملیات بهینه‌سازی
-                if (size <= 500) {
-                    await sharp(buffer).toFile(fileDir + filename);
-                } else if (size <= 1000000) {
-                    await sharp(buffer)
-                        .resize({
-                            width: Math.floor(width / 2),
-                            height: Math.floor(height / 2),
-                            fit: 'cover'
-                        })
-                        .webp({ quality: 90 })
-                        .toFile(fileDir + filename);
-                } else if (size <= 1500000) {
-                    await sharp(buffer)
-                        .resize({
-                            width: Math.floor(width / 3),
-                            height: Math.floor(height / 3),
-                            fit: 'cover'
-                        })
-                        .webp({ quality: 80 })
-                        .toFile(fileDir + filename);
-                } else if (size > 1500000) {
-                    await sharp(buffer)
-                        .resize({
-                            width: Math.floor(width / 4),
-                            height: Math.floor(height / 4),
-                            fit: 'cover'
-                        })
-                        .webp({ quality: 70 })
-                        .toFile(fileDir + filename);
-                }
-
-                /* const {format, width, height, premultiplied, size } = */
+                // تولید نام فایل منحصر به فرد
+                let filename = Date.now().toString('32') + '' + Math.floor(Math.random() * 999999 + 100000) + '.webp';
+                // ذخیره تصویر بهینه شده
+                await sharp(buffer).toFile(fileDir + filename);
                 resolve(filename);
             } catch {
-                // در صورت بروز خطا در آپلود تصویر
+                // در صورت بروز خطا
                 reject({ message: 'تصویر آپلود نشد', status: 400 });
             }
         });
-    } else return null;
+    } else return null; // اگر تصویر اندازه نداشته باشد، مقدار null برمی‌گرداند
 }
-// 500 Internal Server Error: این کد نشان‌دهنده مشکلی در سرور است که باعث ناموفقیت در ذخیره‌سازی تصویر می‌شود
-// 413 Request Entity Too Large: اگر تصویر بسیار بزرگ باشد، این کد نشان‌دهنده این است که سرور قادر به پردازش درخواست نیست.

@@ -12,14 +12,6 @@ const PartSchema = new mongoose.Schema({
         required: true
     },
     product: { type: mongoose.Schema.Types.ObjectId, ref: 'product' },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    },
     metaTitle: {
         type: String,
         trim: true
@@ -34,7 +26,15 @@ const PartSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
-    }
+    },
+    // createdAt: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+    // updatedAt: {
+    //     type: Date,
+    //     default: Date.now
+    // }
 },{ timestamps: true });
 
 //////////////////
@@ -47,14 +47,14 @@ const AnswerModel = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+    // createdAt: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+    // updatedAt: {
+    //     type: Date,
+    //     default: Date.now
+    // }
 },{ timestamps: true });
 
 ////////////////////
@@ -77,14 +77,14 @@ const CommenteSchema = new mongoose.Schema({
       type: Boolean,
       default: true
     },
-    createdAt: {
-      type: Date,
-      default: Date.now
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now
-    }
+    // createdAt: {
+    //   type: Date,
+    //   default: Date.now
+    // },
+    // updatedAt: {
+    //   type: Date,
+    //   default: Date.now
+    // }
   }, { timestamps: true });
 
 /////////////////////
@@ -148,14 +148,18 @@ const ProductsSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    free: {
+        type: Boolean,
+        default: false
     },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+    // createdAt: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+    // updatedAt: {
+    //     type: Date,
+    //     default: Date.now
+    // }
 }, { timestamps: true });
 
 

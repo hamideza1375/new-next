@@ -1,13 +1,23 @@
+import dbConnect from '@/utils/dbConnect';
 import fs from 'fs';
 import util from 'util';
-import dbConnect from '@/utils/dbConnect';
 
+/**
+ * بررسی وجود حروف فارسی در متن
+ * @param {string} input - متن ورودی
+ * @returns {boolean} true اگر حروف فارسی وجود داشته باشد
+ */
 // تابع برای بررسی وجود حروف فارسی در متن
 function hasPersianLetters(input) {
     const persianPattern = /[\u0600-\u06FF\\]/;
     return persianPattern.test(input);
 }
 
+/**
+ * استخراج اطلاعات فایل و خط از stack trace
+ * @param {string} stack - stack trace خطا
+ * @returns {Object} شیء حاوی اطلاعات فایل و خط
+ */
 // تابع برای استخراج اطلاعات فایل و خط از stack trace
 function getFileAndLineFromStack(stack) {
     const stackLines = stack.split('\n');
@@ -23,6 +33,29 @@ function getFileAndLineFromStack(stack) {
     return { file: 'unknown', line: 'unknown' };
 }
 
+/**
+ * سیستم جامع مدیریت و پردازش خطاهای سرور
+ * 
+ * @async
+ * @function errorHandling
+ * @description این تابع یک wrapper برای مدیریت خطاها در برنامه‌های Node.js است.
+ * خطاها را ثبت می‌کند، اطلاعات دقیق اشکال‌زدایی را استخراج می‌نماید و پاسخ مناسب به کاربر ارسال می‌کند.
+ * 
+ * @param {Function} call - تابعی که باید اجرا شود و خطاهای آن مدیریت شود
+ * @returns {Promise<import("next/server").NextResponse>} پاسخ مناسب به کاربر بر اساس نوع خطا
+ * 
+ * @property {Function} hasPersianLetters - بررسی وجود حروف فارسی در متن
+ * @property {Function} getFileAndLineFromStack - استخراج اطلاعات فایل و خط از stack trace
+ * 
+ * @example
+ * // استفاده در API routes
+ * export async function POST(request) {
+ *   return errorHandling(async () => {
+ *     // منطق سرویس
+ *     return Response.json({ data: 'عملیات موفق' });
+ *   });
+ * }
+ */
 // تابع اصلی برای مدیریت خطاها
 export default async function errorHandling(call) {
     try {

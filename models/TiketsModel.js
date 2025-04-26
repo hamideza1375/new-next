@@ -7,14 +7,14 @@ const AnswerTicketSchema = new mongoose.Schema({
 	imageUrl: { type: String },
 	userId: { type: mongoose.Schema.Types.ObjectId },
 	seenDate: { type: Date, default: Date.now() },
-	createdAt: {
-		type: Date,
-		default: Date.now,
-	 },
-	 updatedAt: {
-		type: Date,
-		default: Date.now,
-	 }
+	// createdAt: {
+	// 	type: Date,
+	// 	default: Date.now,
+	//  },
+	//  updatedAt: {
+	// 	type: Date,
+	// 	default: Date.now,
+	//  }
  },{ timestamps: true })
  
 
@@ -42,19 +42,19 @@ const TicketSchema = new mongoose.Schema({
 		enum: ['کم', 'متوسط', 'زیاد'],
 		default: 'متوسط',
 	 },
-	 createdAt: {
-		type: Date,
-		default: Date.now,
-	 },
-	 // تاریخ به‌روزرسانی تیکت
-	 updatedAt: {
-		type: Date,
-		default: Date.now,
-	 },
 	   // تاریخ بسته شدن تیکت
 		closedAt: {
 			type: Date,
-	 }
+	 },
+	//  createdAt: {
+	// 	type: Date,
+	// 	default: Date.now,
+	//  },
+	//  // تاریخ به‌روزرسانی تیکت
+	//  updatedAt: {
+	// 	type: Date,
+	// 	default: Date.now,
+	//  },
  },{ timestamps: true })
  
 

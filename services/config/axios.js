@@ -23,6 +23,9 @@ export const serverResponse = () => {
     let toast429 = error => {
         toast.error(((typeof error === 'string' && error) || (typeof error?.message === 'string' && error.message)) || 'بیش از حد تلاش کردید');
     };
+    let otherErrors = error => {
+        toast.error(((typeof error === 'string' && error) || (typeof error?.message === 'string' && error.message)) || 'مشکلی پیش آمد');
+    };
     let toast500 = (error) => {
         toast.error(((typeof error === 'string' && error) || (typeof error?.message === 'string' && error.message)) || 'خطایی از سمت سرور رخ داد');
     };
@@ -55,7 +58,9 @@ export const serverResponse = () => {
                     toast404();
                 } else if (response.status === 429) {
                     toast429(response.data);
-                } else if (response.status > 404 && response.status <= 500) {
+                } else if (response.status > 404 && response.status <= 429) {
+                    otherErrors(response.data);
+                } else if (response.status > 429 && response.status <= 500) {
                     toast500();
                 }
             }

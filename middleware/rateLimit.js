@@ -1,9 +1,34 @@
 import { cookies } from 'next/headers';
 
+
+/**
+ * میان‌افزار محدودکننده نرخ درخواست (Rate Limiter)
+ * 
+ * @async
+ * @function rateLimit
+ * @description این تابع برای جلوگیری از حملات brute-force و سوء استفاده از API استفاده می‌شود.
+ * با ردیابی تعداد درخواست‌های کاربر از طریق کوکی‌ها، از ارسال درخواست‌های بیش از حد مجاز جلوگیری می‌کند.
+ * 
+ * @param {Function} call - تابعی که باید پس از اعمال محدودیت اجرا شود
+ * @returns {Promise<Response>} پاسخ تابع call یا پیام خطای محدودیت نرخ
+ * 
+ * @property {number} MAX_ATTEMPTS - حداکثر تعداد تلاش‌های مجاز (5 بار)
+ * @property {number} RETRY_LIMIT - حداکثر تعداد دفعات تکرار مجاز (3 بار)
+ * 
+ * @example
+ * // استفاده در API routes
+ * export async function POST(request) {
+ *   return rateLimit(async () => {
+ *     // منطق سرویس
+ *     return Response.json({ data: 'عملیات موفق' });
+ *   });
+ * }
+ */
+
 export default async function rateLimit(call) {
     return errorHandling(async()=>{
         // دریافت کوکی‌ها
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         // دریافت تعداد تلاش‌ها و مقدار retry از کوکی‌ها
         let attempts = Number(cookieStore.get('attempts')?.value) || 0;
         let retry = Number(cookieStore.get('retry')?.value) || 0;

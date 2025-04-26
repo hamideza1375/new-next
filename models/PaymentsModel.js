@@ -11,14 +11,6 @@ const PaymentSchema = new mongoose.Schema({
     success: { type: Boolean, default: false },
     productId: { type: mongoose.Schema.Types.ObjectId },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    },
     status: {
         type: String,
         enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
@@ -27,7 +19,15 @@ const PaymentSchema = new mongoose.Schema({
     items: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'OrderItem'
-    }]
-},{timeStamp:true});
+    }],
+    // createdAt: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+    // updatedAt: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+},{timestamps:true});
 
 export const PaymentsModel = mongoose.models.payment || mongoose.model('payment', PaymentSchema);

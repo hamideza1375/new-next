@@ -1,27 +1,48 @@
 import { useEffect, useRef } from 'react';
 
-let start; // متغیری برای پیگیری شروع تایمر
-export function useDebounceEffect(delayCall, value, delay) {
-    const delayRef = useRef(delay); // برای ذخیره مقدار تاخیر useRef استفاده از
-    const delayCallRef = useRef(delayCall); // برای ذخیره تابع تاخیر useRef استفاده از
+let start; // متغیر سراسری برای پیگیری اولین اجرای تایمر
 
+/**
+ * هوک سفارشی برای ایجاد تاخیر در اجرای اثرات (debounce)
+ * @module useDebounceEffect
+ * @param {Function} delayCall - تابعی که پس از تاخیر باید اجرا شود
+ * @param {any} reEffect - مقداری که تغییر آن باعث فعال شدن تاخیر می‌شود
+ * @param {number} delay - مدت زمان تاخیر به میلی‌ثانیه
+ * @example
+ * // استفاده پایه
+ * useDebounceEffect(() => {
+ *   console.log('Value changed after delay:', searchValue);
+ * }, searchValue, 500);
+ */
+export function useDebounceEffect(delayCall, reEffect, delay) {
+    // ذخیره مقدار تاخیر با useRef برای حفظ مقدار بین رندرها
+    const delayRef = useRef(delay);
+    
+    // ذخیره تابع callback با useRef برای حفظ مقدار بین رندرها
+    const delayCallRef = useRef(delayCall);
+
+    // اثر جانبی برای به‌روزرسانی مقادیر ref هنگام تغییر delay یا delayCall
     useEffect(() => {
-        delayRef.current = delay; // به‌روزرسانی مقدار تاخیر
-        delayCallRef.current = delayCall; // به‌روزرسانی تابع تاخیر
+        delayRef.current = delay;
+        delayCallRef.current = delayCall;
     }, [delay, delayCall]);
 
+    // اثر جانبی اصلی برای پیاده‌سازی الگوی debounce
     useEffect(() => {
-        const handler = start &&
-            setTimeout(() => {
-                delayCallRef.current(); // اجرای تابع تاخیر پس از مدت زمان مشخص
-            }, delayRef.current);
-        start = true; // تنظیم شروع تایمر
-        return () => {
-            if(handler) clearTimeout(handler); // پاک کردن تایمر در صورت تغییر مقدار
-        };
-    }, [value]);
-}
+        // ایجاد تایمر فقط اگر این اولین بار نیست که هوک اجرا می‌شود
+        const handler = start && setTimeout(() => {
+            delayCallRef.current(); // اجرای تابع callback پس از تاخیر
+        }, delayRef.current);
 
+        // علامت‌گذاری که هوک حداقل یک بار اجرا شده است
+        start = true;
+
+        // تابع cleanup برای پاک کردن تایمر در صورت تغییر reEffect قبل از اتمام تاخیر
+        return () => {
+            if (handler) clearTimeout(handler);
+        };
+    }, [reEffect]); // وابستگی به reEffect - با هر تغییر reEffect اثر فعال می‌شود
+}
 
 
 

@@ -1,6 +1,21 @@
 import nodeCache from "node-cache"
 const cache = new nodeCache()
 
+/**
+ * میان‌افزار محدودکننده درخواست‌های متوالی
+ * 
+ * @async
+ * @description این تابع برای جلوگیری از حملات brute-force و سوء استفاده از APIها استفاده می‌شود.
+ * با ردیابی آی‌پی کاربر و شمارش درخواست‌های ناموفق، از ارسال درخواست‌های بیش از حد مجاز جلوگیری می‌کند.
+ * 
+ * @param {import("next/server").NextRequest} req - شیء درخواست
+ * @returns {Promise<void>} Promise که در صورت مجاز بودن درخواست resolve می‌شود
+ * 
+ * @throws {Object} خطای محدودیت دسترسی:
+ * @throws {Object} 429 - اگر تعداد درخواست‌ها بیش از حد مجاز باشد
+ * 
+ */
+
 export default async function block(req) {
     return new Promise((resolve, reject) => {
         // دریافت آی‌پی کاربر
@@ -28,4 +43,3 @@ export default async function block(req) {
     })
 }
 
-// این کد را می‌توان در برنامه‌های وب برای جلوگیری از حملات brute-force و سوء استفاده از API ها استفاده کرد.
