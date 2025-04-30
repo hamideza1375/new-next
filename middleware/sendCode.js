@@ -2,11 +2,9 @@ import nodemailer from 'nodemailer';
 import cache from '@/utils/node_cache.js';
 import { cookies } from 'next/headers';
 
-
-
 /**
  * ارسال کد تأیید به کاربر (ایمیل) با محدودیت نرخ و مدیریت خطاها
- * 
+ *
  * @param {string} to - آدرس ایمیل دریافت‌کننده
  * @param {string} [path=''] - مسیر اختیاری برای محدودیت نرخ (rate limiting)
  * @returns {Promise<{ message: string; }>} - در صورت موفقیت:
@@ -41,14 +39,14 @@ function production_sendCode(to, path = '') {
         const transporter = nodemailer.createTransport({
             service: 'outlook',
             auth: {
-                user: 'reza.attar1375@outlook.com',
+                user: process.env.MY_EMAIL,
                 pass: process.env.SECRET_PASSWORD
             }
         });
         // ارسال ایمیل
         transporter.sendMail(
             {
-                from: 'reza.attar1375@outlook.com',
+                from: process.env.MY_EMAIL,
                 to,
                 subject: 'ارسال کد از jslearn',
                 text: `
@@ -72,23 +70,20 @@ jslearn.ir ارسال از
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-
-
 /**
  * Development) یا Production ارسال کد تأیید به کاربر (در حالت
  * @export
  * @param {string} [to=''] - آدرس ایمیل دریافت‌کننده
- * @param {string} [path=''] - مسیر برای محدودیت نرخ 
+ * @param {string} [path=''] - مسیر برای محدودیت نرخ
  * @returns {Promise<{ message: string }>} - در صورت موفقیت:
  *   - Production: { message: 'کد دریافتی را وارد کنید' }
  *   - Development: { message: '12345 را به عنوان کد وارد کنید' }
  * @throws {Object} - در صورت خطا:
- *   - Production: 
+ *   - Production:
  *     - { message: string; status: 429 } (محدودیت نرخ)
  *     - { message: string } (خطای عمومی)
  *   - Development: خطایی پرتاب نمی‌شود
  */
-
 
 export default function sendCode(to = '', path = '') {
     return new Promise(async (resolve, reject) => {
@@ -96,28 +91,36 @@ export default function sendCode(to = '', path = '') {
             await production_sendCode(to, path);
         } else {
             const cookieStore = await cookies();
-            cookieStore.set('code' + to, 12345, { maxAge: 180 });
-            resolve({ message: '12345 را به عنوان کد وارد کنید' });
+
+            if (!cookieStore.get('code' + to)) {
+                cookieStore.set('code' + to, 12345, { maxAge: 180 });
+                resolve({ message: '12345 را به عنوان کد وارد کنید' });
+            } else {
+                reject({
+                    message:
+                        'بعد از اتمام سه دقیقه دوباره امتحان کنید',
+                    status: 429
+                });
+            }
         }
     });
 }
 
 /**
  * @param {string} to
- * @param {number} code
+ * @param {number | string} code
  * @returns {Promise<void>} - می‌شود resolve اگر کد صحیح باشد، پرامیس با موفقیت
  */
 export const checkCode = (to, code) => {
     return new Promise(async (resolve, reject) => {
         if (isProduction) {
-            if (cache.get('code' + to) != code) reject({ message: 'کد وارد شده اشتباه هست', status: 400 })
+            if (cache.get('code' + to) != code) reject({ message: 'کد وارد شده اشتباه هست', status: 400 });
             else resolve();
-            
         } else {
             const cookieStore = await cookies();
-            if (cookieStore.get('code' + to)?.value != code) reject({ message: 'کد وارد شده اشتباه هست', status: 400 });
+            if (cookieStore.get('code' + to)?.value != code)
+                reject({ message: 'کد وارد شده اشتباه هست', status: 400 });
             else resolve();
-            
         }
     });
 };

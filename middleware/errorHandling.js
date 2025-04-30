@@ -20,7 +20,7 @@ function hasPersianLetters(input) {
  */
 // تابع برای استخراج اطلاعات فایل و خط از stack trace
 function getFileAndLineFromStack(stack) {
-    const stackLines = stack.split('\n');
+    const stackLines = stack?.split('\n');
     if (stackLines.length > 1) {
         const match = stackLines[1].match(/\((.+):(\d+):(\d+)\)/);
         if (match) {
@@ -88,7 +88,7 @@ export default async function errorHandling(call) {
 
         // نمایش خطا در کنسول به صورت رنگی
         console.error(errorMessage(error.message));
-        console.error(errorMessage(error.split('')));
+        console.error(errorMessage(error));
 
         // بررسی وجود حروف فارسی در پیام خطا و ارسال پاسخ مناسب
         if (hasPersianLetters(error?.message)) {

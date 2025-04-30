@@ -5,7 +5,8 @@ import mongoose, { Schema, Model, Document } from "mongoose";
 import { getScryptParams } from '@/utils/getScryptParams';
 
 // Interface for User document
-interface IUser extends Document {
+export interface IUser extends Document {
+    _id: any;
     username?: string;
     email: string;
     phone?: string;
@@ -47,7 +48,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
         type: String,
         required: true,
         minlength: [6, 'رمز عبور باید حداقل ۶ کاراکتر باشد'],
-        select: false
+        // select: false
     },
     isAdmin: { type: Number, required: false, sparse: true },
     seller: { type: mongoose.Schema.Types.ObjectId, ref: 'Seller' },
