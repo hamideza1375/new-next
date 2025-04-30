@@ -1,5 +1,6 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import { IUser } from "@/models/UsersModel";
+import { boolean } from "yup";
 
 export interface IAnswerTicket extends Document {
     message?: string;
@@ -25,10 +26,10 @@ export interface ITicket extends Document {
     title: string;
     message?: string;
     image?: string;
-    answer: IAnswerTicket[];
+    answer?: Types.DocumentArray<IAnswerTicket>;
     user: Types.ObjectId | IUser;
-    userSeen: number;
-    adminSeen: number;
+    userSeen: boolean;
+    adminSeen: boolean;
     category: TicketCategory;
     status: TicketStatus;
     priority: TicketPriority;
@@ -51,18 +52,21 @@ const TicketSchema: Schema<ITicket> = new mongoose.Schema({
     image: { 
         type: String 
     },
-    answer: [AnswerTicketSchema],
+    answer: { 
+        type: [AnswerTicketSchema],
+        default: [] 
+      },
     user: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User' 
     },
     userSeen: { 
-        type: Number, 
-        default: 1 
+        type: Boolean, 
+        default: false
     },
     adminSeen: { 
-        type: Number, 
-        default: 0 
+        type: Boolean, 
+        default: false
     },
     category: {
         type: String,

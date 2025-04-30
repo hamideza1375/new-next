@@ -2,15 +2,15 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 
 // Interface for Category document
 export interface ICategory extends Document {
-    name: string;
-    image?: string;
+    title: string;
+    image: string;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
 
 const categorySchema: Schema<ICategory> = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
         required: [true, 'لطفا نام دسته‌بندی را وارد کنید'],
         unique: true,

@@ -7,15 +7,13 @@ export interface IPart extends Document {
     chapter: number;
     title: string;
     video: string;
-    source?: string;
-    description: string;
     product: Types.ObjectId;
+    description: string;
+    source?: string;
     metaTitle?: string;
     metaDescription?: string;
     metaKeywords?: string[];
-    isActive: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    isActive?: boolean;
 }
 
 const PartSchema: Schema<IPart> = new mongoose.Schema({
@@ -27,7 +25,7 @@ const PartSchema: Schema<IPart> = new mongoose.Schema({
         type: String,
         required: true
     },
-    product: { type: mongoose.Schema.Types.ObjectId, ref: 'product' },
+    product: { type: mongoose.Schema.Types.ObjectId },
     metaTitle: {
         type: String,
         trim: true
@@ -71,15 +69,13 @@ const AnswerSchema: Schema<IAnswer> = new mongoose.Schema({
 export interface IComment extends Document {
     username: string;
     message: string;
-    show: boolean;
+    show?: boolean;
     rating: number;
-    user: Types.ObjectId;
-    likes: Types.ObjectId[];
-    likeCount: number;
-    answer: IAnswer[];
-    isActive: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    user: Types.ObjectId | string;
+    likes?: Types.ObjectId[];
+    likeCount?: number;
+    answer?: IAnswer[];
+    isActive?: boolean;
 }
 
 const CommentSchema: Schema<IComment> = new mongoose.Schema({
@@ -122,7 +118,7 @@ export interface IProduct extends Document {
         value: number;
     };
     comments: IComment[];
-    parts: IPart[];
+    parts: Types.DocumentArray<IPart>;
     seller: Types.ObjectId;
     stock: number;
     rating: number;

@@ -16,7 +16,7 @@ export async function POST(req, { params }) {
 
     const ticket = await TicketModel.findById(params.id[0]);
     ticket.userSeen = 1;
-    ticket.adminSeen = 0;
+    ticket.adminSeen = false;
     ticket.date = new Date();
 
     ticket.answer.push({
@@ -55,7 +55,7 @@ export async function PUT(req, { params }) {
     answer.message = message;
     if (image?.size) answer.imageUrl = filename;
     ticket.date = new Date();
-    ticket.adminSeen = 0;
+    ticket.adminSeen = false;
 
     await ticket.save();
     return Response.json({ message: 'تیکت شما با موفقیت ارسال شد', dt: answer });
