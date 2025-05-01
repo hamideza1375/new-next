@@ -1,6 +1,7 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import '@/models/UsersModel';
 import '@/models/SellerModel';
+import { IUser } from "@/models/UsersModel";
 
 
 export interface IPart extends Document {
@@ -71,9 +72,9 @@ export interface IComment extends Document {
     message: string;
     show?: boolean;
     rating: number;
-    user: Types.ObjectId | string;
-    likes?: Types.ObjectId[];
-    likeCount?: number;
+    user: Types.ObjectId | IUser;
+    likes: Types.ObjectId[];
+    likeCount: number;
     answer?: IAnswer[];
     isActive?: boolean;
 }
@@ -117,7 +118,7 @@ export interface IProduct extends Document {
         exp: number;
         value: number;
     };
-    comments: IComment[];
+    comments: Types.DocumentArray<IComment>;
     parts: Types.DocumentArray<IPart>;
     seller: Types.ObjectId;
     stock: number;

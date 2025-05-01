@@ -1,13 +1,16 @@
-import { ObjectId, ProductsModel } from '@/models/ProductModel';
+import { IProduct, ProductsModel } from '@/models/ProductModel';
 import dbConnect from '@/utils/dbConnect';
 import errorHandling from '@/middleware/errorHandling';
+import { NextRequest } from 'next/server';
+import mongoose from 'mongoose';
+import getUser from '@/utils/getUser';
 
-export async function POST(req, { params }) {
+export async function POST(req:NextRequest, { params }:{params:{id:string}}) {
     return errorHandling(async()=>{
     await dbConnect();
     const { message, to } = await req.json();
 
-    const _user = JSON.parse(req.headers.get('user'));
+    const _user = getUser(req);
 
     if(!_user.isAdmin) return Response.json('شما مجوز این کار را ندارید', {status:429})
 
@@ -24,18 +27,18 @@ export async function POST(req, { params }) {
         }
     );
     
-    const updatedComment = await ProductsModel.findOne({ 'comments._id': params.id });
-    return Response.json({ message: 'ساخته شد', dt: updatedComment.comments.id(params.id).answer });
+    const updatedComment = await ProductsModel.findOne({ 'comments._id': params.id }) as IProduct;
+    return Response.json({ message: 'ساخته شد', dt: updatedComment?.comments.id(params.id)?.answer });
 })
 }
 
-export async function GET(req, { params }) {
+export async function GET(req:NextRequest, { params }:{params:{id:string}}) {
     await dbConnect();
 
     const answer = await ProductsModel.aggregate([
         { $unwind: '$comments' },
         { $unwind: '$comments.answer' },
-        { $match: { 'comments.answer._id': new ObjectId(params.id) } },
+        { $match: { 'comments.answer._id': new mongoose.Types.ObjectId(params.id) } },
         { $replaceRoot: { newRoot: '$comments.answer' } }
     ]);
 
@@ -43,13 +46,13 @@ export async function GET(req, { params }) {
 }
 
 
-export async function PUT(req, { params }) {
+export async function PUT(req:NextRequest, { params }:{params:{id:string}}) {
     return errorHandling(async()=>{
     await dbConnect();
 
     const { message } = await req.json();
 
-    const _user = JSON.parse(req.headers.get('user'));
+    const _user = getUser(req);
 
     if(!_user.isAdmin) return Response.json('شما مجوز این کار را ندارید', {status:429})
 
@@ -70,11 +73,12 @@ export async function PUT(req, { params }) {
 }
 
 
-export async function DELETE(req, { params }) {
+export async function DELETE(req:NextRequest, { params }:{params:{id:string}}) {
     return errorHandling(async()=>{
     await dbConnect();
 
-    const _user = JSON.parse(req.headers.get('user'));
+    const userHeader = req.headers.get('user');
+    const _user = userHeader && JSON.parse(userHeader);
 
     if(!_user.isAdmin) return Response.json('شما مجوز این کار را ندارید', {status:429})
 

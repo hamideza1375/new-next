@@ -4,7 +4,7 @@ import { IProduct } from "@/models/ProductModel";
 
 export interface ISeller extends Document {
     brand: string;
-	 user: Types.ObjectId | IUser;
+	user: Types.ObjectId | IUser;
     phone: string;
     isActive: boolean;
     password: string;

@@ -1,8 +1,8 @@
-import errorHandling from '@/middleware/errorHandling';
 import authUserRoutes from '@/middleware/authUserRoutes';
+import errorHandling from '@/middleware/errorHandling';
 import { IProduct, ProductsModel } from '@/models/ProductModel';
-import getUser from '@/utils/getUser';
 import dbConnect from '@/utils/dbConnect';
+import getUser from '@/utils/getUser';
 import { NextRequest } from 'next/server';
 
 interface Comment {
