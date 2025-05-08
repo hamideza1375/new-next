@@ -21,7 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         mainID: productObject._id,
         title: part.title,
         description: part.description,
-        videoUrl: part.video,
+        videoUrl: part.videoUrl,
         chapter: part.chapter /* offer:product.offer */
     });
 }

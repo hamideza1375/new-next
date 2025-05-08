@@ -25,8 +25,8 @@ export type TicketPriority = 'Low' | 'Medium' | 'high ';
 export interface ITicket extends Document {
     title: string;
     message?: string;
-    image?: string;
-    answer?: Types.DocumentArray<IAnswerTicket>;
+    imageUrl?: string;
+    answer: Types.DocumentArray<IAnswerTicket>;
     user: Types.ObjectId | IUser;
     userSeen: boolean;
     adminSeen: boolean;
@@ -49,7 +49,7 @@ const TicketSchema: Schema<ITicket> = new mongoose.Schema({
         // required: true, 
         // minlength: 1 
     },
-    image: { 
+    imageUrl: { 
         type: String 
     },
     answer: { 

@@ -1,10 +1,9 @@
-import { NextRequest } from 'next/server';
-import dbConnect from '@/utils/dbConnect';
-import { IComment, ProductsModel } from '@/models/ProductModel';
 import errorHandling from '@/middleware/errorHandling';
-import { Types } from 'mongoose';
-import { IUser } from '@/models/UsersModel';
+import { IComment, ProductsModel } from '@/models/ProductModel';
+import dbConnect from '@/utils/dbConnect';
 import getUser from '@/utils/getUser';
+import { Types } from 'mongoose';
+import { NextRequest } from 'next/server';
 
 
 

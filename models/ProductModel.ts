@@ -7,10 +7,10 @@ import { IUser } from "@/models/UsersModel";
 export interface IPart extends Document {
     chapter: number;
     title: string;
-    video: string;
+    videoUrl: string;
     product: Types.ObjectId;
     description: string;
-    source?: string;
+    sourceUrl?: string;
     metaTitle?: string;
     metaDescription?: string;
     metaKeywords?: string[];
@@ -20,8 +20,8 @@ export interface IPart extends Document {
 const PartSchema: Schema<IPart> = new mongoose.Schema({
     chapter: { type: Number, required: true },
     title: { type: String, required: true },
-    video: { type: String, required: true },
-    source: { type: String },
+    videoUrl: { type: String, required: true },
+    sourceUrl: { type: String },
     description: {
         type: String,
         required: true
@@ -110,8 +110,8 @@ export interface IProduct extends Document {
     info: string;
     price: number;
     description: string;
-    image: string;
-    video?: string;
+    imageUrl: string;
+    videoUrl?: string;
     categoryId: Types.ObjectId;
     popular: boolean;
     offer: {
@@ -147,11 +147,11 @@ const ProductSchema: Schema<IProduct> = new mongoose.Schema({
         required: [true, 'قیمت گذاری اجباری است']
     },
     description: { type: String, required: [true, 'توضیحات محصول اجباری است'] },
-    image: {
+    imageUrl: {
         type: String,
         required: true
     },
-    video: String,
+    videoUrl: String,
     categoryId: { type: mongoose.Schema.Types.ObjectId, required: [true, 'شناسه ی دسته ی محصول را وارد کنید'] },
     popular: { type: Boolean, default: false },
     offer: { type: Object, default: { exp: 0, value: 0 } },

@@ -3,7 +3,7 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 // Interface for Category document
 export interface ICategory extends Document {
     title: string;
-    image: string;
+    imageUrl: string;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -16,7 +16,7 @@ const categorySchema: Schema<ICategory> = new mongoose.Schema({
         unique: true,
         trim: true
     },
-    image: {
+    imageUrl: {
         type: String,
         // default: 'default-category.jpg'
     },
