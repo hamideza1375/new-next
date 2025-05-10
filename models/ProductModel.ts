@@ -1,6 +1,5 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 import '@/models/UsersModel';
-import '@/models/SellerModel';
 import { IUser } from "@/models/UsersModel";
 
 
@@ -120,7 +119,6 @@ export interface IProduct extends Document {
     };
     comments: Types.DocumentArray<IComment>;
     parts: Types.DocumentArray<IPart>;
-    seller: Types.ObjectId;
     stock: number;
     rating: number;
     ratings: number;
@@ -157,11 +155,6 @@ const ProductSchema: Schema<IProduct> = new mongoose.Schema({
     offer: { type: Object, default: { exp: 0, value: 0 } },
     comments: [CommentSchema],
     parts: [PartSchema],
-    seller: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Seller',
-        required: true
-    },
     stock: {
         type: Number,
         default: 0

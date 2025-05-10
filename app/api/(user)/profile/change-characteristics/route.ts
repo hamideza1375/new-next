@@ -23,7 +23,6 @@ interface RequestBodyPUT {
 }
 
 interface UserToken {
-    sellerId?: string;
     userId?: string;
     username?: string;
     email: string;
@@ -121,7 +120,6 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
         await user.save();
 
         const forUserToken: UserToken = {
-            ...(user.seller && { sellerId: user.seller.toString() }),
             userId: user._id.toString(),
             username: user.username,
             email: user.email,

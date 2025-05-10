@@ -11,7 +11,6 @@ interface RequestBody {
 }
 
 interface UserToken {
-    sellerId?: string;
     userId?: string;
     username?: string;
     email: string;
@@ -45,7 +44,7 @@ export async function POST(req: NextRequest) {
                 
                 // ایجاد توکن برای کاربر عادی
                 const forUserToken: UserToken = {
-                    ...(user.seller && { sellerId: user.seller.toString() }),
+                    // ...(user.seller && { sellerId: user.seller.toString() }),
                     userId: user._id.toString(),
                     username: user.username,
                     email: user.email,

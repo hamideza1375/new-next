@@ -10,8 +10,6 @@ import { cookies } from 'next/headers';
  * @description این میان‌افزار برای احراز هویت کاربران عادی و مدیریت دسترسی‌ها استفاده می‌شود.
  * توکن‌های کاربر را بررسی کرده و اعتبارسنجی می‌نماید، سپس در صورت معتبر بودن، اطلاعات کاربر را به هدر اضافه می‌کند.
  * 
- * @param {import("next/server").NextRequest} req - شیء درخواست
- * @param {import("next/server").NextResponse} res - شیء پاسخ
  * @param {import("next/server").NextResponse} next - تابع بعدی در زنجیره میان‌افزار
  * @returns {Promise<void>} Promise که پس از انجام عملیات resolve می‌شود یا در صورت خطا reject می‌شود
  * 
@@ -20,7 +18,7 @@ import { cookies } from 'next/headers';
  * @throws {Object} 403 - اگر کاربر دسترسی لازم را نداشته باشد (ممنوع)
  */
 
-export default async function authUser(req, res, next) {
+export default async function authUser(next) {
     return new Promise(async (resolve, reject)=>{
         const cookieStore = await cookies();
         // دریافت توکن کاربر از کوکی‌ها
