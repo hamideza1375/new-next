@@ -1,6 +1,5 @@
 'use client'
 import Image from "next/image";
-import Input from "@/components/other/input";
 
 export default function Home() {
   return (

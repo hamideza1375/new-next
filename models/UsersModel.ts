@@ -1,4 +1,3 @@
-import '@/models/SellerModel';
 import { CustomError } from '@/utils/CustomError';
 import crypto from 'crypto';
 import mongoose, { Schema, Model, Document } from "mongoose";
@@ -12,7 +11,6 @@ export interface IUser extends Document {
     phone?: string;
     password: string;
     isAdmin?: number;
-    seller?: mongoose.Types.ObjectId;
     products?: any[];
     blocked?: number;
     address?: string;
@@ -51,7 +49,6 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
         // select: false
     },
     isAdmin: { type: Number, required: false, sparse: true },
-    seller: { type: mongoose.Schema.Types.ObjectId, ref: 'Seller' },
     products: { type: Array, default: [{productId:'', version:''}] },
     blocked: { type: Number, default: 0 },
     address: {

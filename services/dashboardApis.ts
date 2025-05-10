@@ -25,9 +25,6 @@ export const deletNotification = () => axios.delete(`/dashboard/notification`);
 export const addAdmin = (data: any) => axios.post(`/dashboard/admin`,data);
 export const deleteAdmin = (data: any) => axios.put(`/dashboard/admin`,data);
 
-export const addSeller = (data: any) => axios.post(`/dashboard/seller`, data);
-export const deleteSeller = (data: any) => axios.put(`/dashboard/seller`, data);
-
 export const postAnswerTicket = (id: string, data: any) => axios.postFile(`/dashboard/tickets/answer/${id}`,data);
 export const deleteAnswerTicket = (ticketID: string,answerID: string) => axios.delete(`/dashboard/tickets/answer/${ticketID}/${answerID}`);
 export const editAnswerTicket = (ticketID: string,answerID: string,data: any) => axios.putFile(`/dashboard/tickets/answer/${ticketID}/${answerID}`,data);

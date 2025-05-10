@@ -20,6 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
+    "react-modern-drawer": "^1.4.0",
     "react-simple-captcha": "^9.3.1",
     "react-star-ratings": "^2.3.0",
     "react-toastify": "^11.0.3",

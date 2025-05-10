@@ -18,7 +18,6 @@ interface Products {
 }
 
 interface UserToken {
-    sellerId?: string;
     userId?: string;
     username?: string;
     email: string;
@@ -71,7 +70,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
         // Create JWT tokens
         const forToken: UserToken = {
-            ...(user.seller && { sellerId: user.seller.toString() }),
             userId: user._id?.toString(),
             username: user.username,
             email: user.email,

@@ -15,7 +15,7 @@ import { cookies } from 'next/headers';
  * @returns {Promise<void>} Promise که پس از انجام عملیات resolve می‌شود
  */
 
-export default async function authProducts(req, res, next) {
+export default async function authProducts(next) {
     return new Promise(async (resolve)=>{
         const cookieStore = await cookies();
         // دریافت توکن کاربر از کوکی‌ها
