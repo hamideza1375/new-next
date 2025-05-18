@@ -76,11 +76,7 @@ export const serverResponse = (): null => {
                         toast500();
                         break;
                     default:
-                        if (response.status > 400 && response.status < 500) {
-                            otherErrors(response.data);
-                        } else if (response.status > 500) {
-                            toast500();
-                        }
+                        otherErrors(response.data)
                         break;
                 }
             }

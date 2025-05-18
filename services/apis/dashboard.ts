@@ -1,4 +1,4 @@
-import { axios } from './config/axios';
+import { axios } from '../config/axios';
 
 // export const createCategory = (data) => axios.post('/dashboard/categories',data, { headers: { 'Content-Type': 'multipart/form-data' } })
 export const createCategory = (data: any) => axios.postFile('/dashboard/categories', data);

@@ -1,4 +1,4 @@
-import { Fetch, axios } from './config/axios';
+import { Fetch, axios } from '../config/axios';
 
 export const getComments = (id: string, option: any) => Fetch.get(`/products/comments?productID=${id}`, option);
 

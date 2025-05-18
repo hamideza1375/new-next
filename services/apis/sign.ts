@@ -1,4 +1,4 @@
-import { axios } from "./config/axios";
+import { axios } from "../config/axios";
 
 export const signApi = (data: any) => axios.post('/sign',data);
 

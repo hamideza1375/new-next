@@ -1,4 +1,4 @@
-import { axios } from "./config/axios";
+import { axios } from "../config/axios";
 
 export const getCodeChangeCharacteristicsApi = (data: any) => axios.post('/profile/change-characteristics',data);
 export const changecharaCteristicsApi = (data: any) => axios.put('/profile/change-characteristics',data);

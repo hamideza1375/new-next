@@ -1,9 +1,7 @@
 'use client'
 import Image from "next/image";
-<<<<<<< HEAD
 import { ReactElement } from "react";
-=======
->>>>>>> hamid
+
 
 export default function Home(): ReactElement {
   return (
