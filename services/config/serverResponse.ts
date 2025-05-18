@@ -13,7 +13,7 @@ export const serverResponse = (): null => {
     };
 
     const toast401 = (error: ServerResponseData): void => {
-        toast.error(typeof error === 'string' ? error : 'عدم دسترسی');
+        toast.error(typeof error === 'string' ? error : 'ابتدا وارد حساب خود شوید');
     };
 
     const toast404 = (): void => {

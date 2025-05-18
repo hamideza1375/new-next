@@ -22,8 +22,7 @@ export async function middleware(req: NextRequest) {
 
       await block(req);
 
-      // بررسی userAgent
-      if (_userAgent(req)) return isBotMessage();
+      await _userAgent(req)
 
       // بررسی حجم تصویر
       if ((await preventInvalidPhotos(req)) === 'MAX_LENGTH') {
@@ -57,17 +56,10 @@ export async function middleware(req: NextRequest) {
          if (error) return NextResponse.redirect(new URL('/profile', req.url));
          return response;
       }
-   } catch (error: unknown) {
-      const err = error as Error & { status?: number };
-      return new Response(err?.message || 'خطای سرور', {
-         status: err?.status || 500
-      });
+   } catch (error: any) {
+      return new Response(`<!DOCTYPE html><html><head><meta charset=""><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>boot</title></head><body dir="rtl" style="height:100vh;width:100vw;background-color:#0a0010; overflow:hidden; display:flex; flex-direction:column; align-items: center " ><h2 style="text-align:center; margin-inline:auto;color:#a22; margin-top:30px" >${error?.message || 'مشکلی پیش آمد'}</h2></body></html>`,
+      { headers: { 'Content-Type': 'text/html; charset=utf-8' }, status: error?.status || 500 });
    }
 }
 
-function isBotMessage() {
-   return new NextResponse(
-      `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>boot</title></head><body dir="rtl" style="height:100vh;width:100vw;background-color:#0a0010; overflow:hidden; display:flex; flex-direction:column; align-items: center " ><h2 style="text-align:center; margin-inline:auto;color:#a22; margin-top:30px" >اگر فیلتر شکن شما روشن هست آن را خاموش کنید</h2></body></html>`,
-      { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
-   );
-}
+

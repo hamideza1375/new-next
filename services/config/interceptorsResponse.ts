@@ -32,7 +32,7 @@ const toast401 = (error: ResponseData | string): void => {
     toast.error(
         (typeof error === 'string' && error) ||
         (typeof (error as ResponseData)?.message === 'string' && (error as ResponseData).message) ||
-        'عدم دسترسی'
+        'ابتدا به حساب خود وارد شوید'
     );
 };
 
