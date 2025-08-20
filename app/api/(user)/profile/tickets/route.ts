@@ -1,6 +1,6 @@
 import authUserRoutes from '@/middleware/authUserRoutes';
 import errorHandling from '@/middleware/errorHandling';
-import optimizeImage from '@/middleware/imageUpload';
+import imageUpload from '@/middleware/imageUpload';
 import { TicketModel } from '@/models/TiketsModel';
 import dbConnect from '@/utils/dbConnect';
 import getUser from '@/utils/getUser';
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
         const formdata = await req.formData();
         const { image, title, message } = Object.fromEntries(formdata) as unknown as NewType;
 
-        const filename = await optimizeImage(image);
+        const filename = await imageUpload(image);
 
         const newTicket = await TicketModel.create({
             title: title,

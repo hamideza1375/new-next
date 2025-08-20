@@ -37,7 +37,8 @@ export default function optimizeImage(image) {
 
             let fileDir;
             // بررسی مسیر ارجاع دهنده برای تعیین دایرکتوری فایل
-            if (_headers.get('referer').includes('tickets')) fileDir = process.cwd() + '/assets/uploads/ticket/';
+            if (_headers.get('referer').includes('tickets')) 
+                fileDir = process.cwd() + '/assets/uploads/ticket/';
             else if (_headers.get('referer').includes('questions'))
                 fileDir = process.cwd() + '/assets/uploads/question/';
 

@@ -6,6 +6,7 @@ import { existsSync, unlinkSync, writeFileSync } from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import mongoose from 'mongoose';
+import errorHandling from '@/middleware/errorHandling';
 
 interface Params {
     id: string;
@@ -21,11 +22,9 @@ interface ProductFormData {
 }
 
 // تابع GET برای دریافت اطلاعات محصول
-export async function GET(
-    req: NextRequest,
-    { params }: { params: Params }
+export async function GET(req: NextRequest,{ params }: { params: Params }
 ): Promise<NextResponse> {
-    try {
+    return errorHandling(async () => {
         await dbConnect();
         await authAdminRoutes();
 
@@ -47,13 +46,7 @@ export async function GET(
         }
 
         return NextResponse.json(product);
-    } catch (error: any) {
-        console.error('خطا در دریافت محصول:', error);
-        return NextResponse.json(
-            { error: error?.message || 'خطای سرور' },
-            { status: error?.status || 500 }
-        );
-    }
+    })
 }
 
 // تابع PUT برای به‌روزرسانی اطلاعات محصول

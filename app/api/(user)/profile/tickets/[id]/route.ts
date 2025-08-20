@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { existsSync, unlinkSync } from 'fs';
 import path from 'path';
 import errorHandling from '@/middleware/errorHandling';
-import optimizeImage from '@/middleware/imageUpload';
+import imageUpload from '@/middleware/imageUpload';
 import { ITicket, TicketModel } from '@/models/TiketsModel';
 import dbConnect from '@/utils/dbConnect';
 import getUser from '@/utils/getUser';
@@ -111,7 +111,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       }
     }
 
-    const filename = image?.size ? await optimizeImage(image) : undefined;
+    const filename = image?.size ? await imageUpload(image) : undefined;
 
     // Update ticket fields
     ticket.title = title;

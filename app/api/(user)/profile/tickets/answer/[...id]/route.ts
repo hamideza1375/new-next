@@ -1,5 +1,5 @@
 import errorHandling from '@/middleware/errorHandling';
-import optimizeImage from '@/middleware/imageUpload';
+import imageUpload from '@/middleware/imageUpload';
 import { ITicket, TicketModel } from '@/models/TiketsModel';
 import dbConnect from '@/utils/dbConnect';
 import getUser from '@/utils/getUser';
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string[
       return NextResponse.json({ error: 'Ticket ID is required' }, { status: 400 });
     }
 
-    const filename = image ? await optimizeImage(image) : null;
+    const filename = image ? await imageUpload(image) : null;
 
     const ticket = await TicketModel.findById(params.id[0]) as unknown as ITicket;
     if (!ticket) {
@@ -84,7 +84,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string[]
       }
     }
 
-    const filename = image?.size ? await optimizeImage(image) : null;
+    const filename = image?.size ? await imageUpload(image) : null;
 
     answer.message = message;
     if (filename) answer.imageUrl = filename;

@@ -18,6 +18,7 @@ import sharp from 'sharp';
 // تابعی برای بهینه سازی تصویر گواهی
 export default function imageUpload(image) {
     // بررسی می کند که آیا تصویر دارای اندازه است یا خیر
+    if(!image) return null
     if (image?.size) {
         return new Promise(async (resolve, reject) => {
             // مسیر دایرکتوری فایل
