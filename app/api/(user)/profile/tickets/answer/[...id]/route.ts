@@ -34,7 +34,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string[
     const newAnswer = {
       message: message,
       userId: _user.userId,
-      date: new Date(),
       ...(image && filename && { imageUrl: filename })
     };
 

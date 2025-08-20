@@ -41,8 +41,8 @@ function getFileAndLineFromStack(stack) {
  * @description این تابع یک wrapper برای مدیریت خطاها در برنامه‌های Node.js است.
  * خطاها را ثبت می‌کند، اطلاعات دقیق اشکال‌زدایی را استخراج می‌نماید و پاسخ مناسب به کاربر ارسال می‌کند.
  * 
- * @param {Function} call - تابعی که باید اجرا شود و خطاهای آن مدیریت شود
- * @returns {Promise<import("next/server").NextResponse>} پاسخ مناسب به کاربر بر اساس نوع خطا
+ * @param {Function<any>} call - تابعی که باید اجرا شود و خطاهای آن مدیریت شود
+ * @returns {Promise<import("next/server").NextResponse> || Promise<Response>} پاسخ مناسب به کاربر بر اساس نوع خطا
  * 
  * @property {Function} hasPersianLetters - بررسی وجود حروف فارسی در متن
  * @property {Function} getFileAndLineFromStack - استخراج اطلاعات فایل و خط از stack trace

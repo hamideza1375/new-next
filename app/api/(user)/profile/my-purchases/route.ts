@@ -26,7 +26,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const lastPayment = await PaymentsModel.find({ 
             success: true, 
             user: _user.userId
-        }).sort({ date: -1 });
+        }).sort({ createdAt: -1 });
 
 
         // Return the list as JSON

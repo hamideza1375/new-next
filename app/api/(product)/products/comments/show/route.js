@@ -2,16 +2,17 @@ import authAdminRoutes from '@/middleware/authAdminRoutes';
 import errorHandling from '@/middleware/errorHandling';
 import { ProductsModel } from '@/models/ProductModel';
 import dbConnect from '@/utils/dbConnect';
+import getUser from '@/utils/getUser';
 
 export async function PUT(req) {
     return errorHandling(async()=>{
 
         await dbConnect();
-        await authAdminRoutes(req);
+        await authAdminRoutes();
 
         const id = req.nextUrl.searchParams.get('commentID');
 
-        const _user = JSON.parse(req.headers.get('user'));
+        const _user = getUser(req);
 
         if (!_user.isAdmin) return Response.json('شما ادمین نیستید', { status: 403 });
 

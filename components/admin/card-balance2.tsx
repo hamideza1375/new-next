@@ -3,7 +3,7 @@ import { Card, CardBody } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 
 interface Transaction {
-  date: string;
+  createdAt: string;
   price: number;
 }
 

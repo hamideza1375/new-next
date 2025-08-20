@@ -1,4 +1,5 @@
 import authAdminRoutes from '@/middleware/authAdminRoutes';
+import errorHandling from '@/middleware/errorHandling';
 import { CategoriesModel } from '@/models/CategoriesModel';
 import { ICategory } from '@/models/CategoriesModel';
 import dbConnect from '@/utils/dbConnect';
@@ -8,87 +9,58 @@ import path from 'path';
 
 // تابع POST برای ایجاد دسته‌بندی جدید
 export async function POST(req: NextRequest): Promise<NextResponse> {
-    try {
-        await dbConnect();
-        await authAdminRoutes();
-        
-        const formData = await req.formData();
-        const file = formData.get('image') as File | null;
-        const title = formData.get('title') as string | null;
+   return errorHandling(async () => {
+      await dbConnect();
+      await authAdminRoutes();
 
-        // اعتبارسنجی فایل
-        if (!file || !title) {
-            return NextResponse.json(
-                { error: 'عنوان و تصویر الزامی هستند' },
-                { status: 400 }
-            );
-        }
+      const formData = await req.formData();
+      const file = formData.get('image') as File | null;
+      const title = formData.get('title') as string | null;
 
-        // اعتبارسنجی نوع فایل
-        if (!file.type.startsWith('image/')) {
-            return NextResponse.json(
-                { error: 'فایل باید یک تصویر باشد' },
-                { status: 400 }
-            );
-        }
+      // اعتبارسنجی فایل
+      if (!file || !title) {
+         return NextResponse.json({ error: 'عنوان و تصویر الزامی هستند' }, { status: 400 });
+      }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `${Date.now().toString(32)}${Math.floor(Math.random() * 89999 + 10000)}_${file.name.replace(/\s+/g, '_')}`;
-        const uploadPath = path.join(process.cwd(), 'assets/uploads/product/', filename);
+      // اعتبارسنجی نوع فایل
+      if (!file.type.startsWith('image/')) {
+         return NextResponse.json({ error: 'فایل باید یک تصویر باشد' }, { status: 400 });
+      }
 
-        try {
-            await writeFile(uploadPath, buffer);
-        } catch (error) {
-            console.error('خطا در ذخیره فایل:', error);
-            return NextResponse.json(
-                { error: 'خطا در ذخیره تصویر' },
-                { status: 500 }
-            );
-        }
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const filename: string = crypto.randomUUID() + '.' + file.type.slice(6);
+      const uploadPath = path.join(process.cwd(), 'assets/uploads/product/', filename);
 
-        const category: ICategory = await CategoriesModel.create({ 
-            title, 
-            imageUrl: filename 
-        });
+      try {
+         await writeFile(uploadPath, buffer);
+      } catch (error) {
+         console.error('خطا در ذخیره فایل:', error);
+         return NextResponse.json({ error: 'خطا در ذخیره تصویر' }, { status: 500 });
+      }
 
-        return NextResponse.json(
-            { 
-                message: 'دسته‌بندی با موفقیت ایجاد شد', 
-                data: category 
-            },
-            { status: 201 }
-        );
-    } catch (error: any) {
-        console.error('خطا در ایجاد دسته‌بندی:', error);
-        return NextResponse.json(
-            { 
-                error: error?.message || 'خطای سرور' 
-            },
-            { 
-                status: error?.status || 500 
-            }
-        );
-    }
+      const category: ICategory = await CategoriesModel.create({
+         title,
+         imageUrl: filename
+      });
+
+      return NextResponse.json(
+         {
+            message: 'دسته‌بندی با موفقیت ایجاد شد',
+            data: category
+         },
+         { status: 201 }
+      );
+})
 }
 
 // تابع GET برای دریافت دسته‌بندی‌ها
 export async function GET(req: NextRequest): Promise<NextResponse> {
-    try {
-        await dbConnect();
-        await authAdminRoutes();
-        
-        const categories: ICategory[] = await CategoriesModel.find().lean();
-        
-        return NextResponse.json(categories);
-    } catch (error: any) {
-        console.error('خطا در دریافت دسته‌بندی‌ها:', error);
-        return NextResponse.json(
-            { 
-                error: error?.message || 'خطای سرور' 
-            },
-            { 
-                status: error?.status || 500 
-            }
-        );
-    }
+   return errorHandling(async () => {
+      await dbConnect();
+      await authAdminRoutes();
+
+      const categories: ICategory[] = await CategoriesModel.find().sort('-createdAt').lean();
+
+      return NextResponse.json(categories);
+   });
 }

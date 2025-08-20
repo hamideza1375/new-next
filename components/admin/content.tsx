@@ -8,7 +8,7 @@ import { CardTransactions } from './card-transactions';
 import { VictoryTooltip } from './VictoryTooltip';
 
 interface ChartData {
-  date: string;
+  createdAt: string;
   price: number;
 }
 

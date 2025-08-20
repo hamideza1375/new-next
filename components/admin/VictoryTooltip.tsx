@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { VictoryAxis, VictoryBar, VictoryGroup, VictoryLabel, VictoryTooltip as _VictoryTooltip } from 'victory';
 
 interface DataItem {
-  date: string;
+  createdAt: string;
   price: number;
 }
 
 interface FormattedDataItem {
-  date: string;
+  createdAt: string;
   price: number;
   _y?: number;
 }
@@ -34,19 +34,19 @@ export const VictoryTooltip = ({ data = [] }: { data?: DataItem[] }) => {
 
   useEffect(() => {
     // دسته‌بندی داده‌ها بر اساس ماه
-    const dataByMonth = data.reduce<Record<string, { date: string; price: number }>>((acc, item) => {
-      let d = new Date(item.date).toLocaleDateString('fa');
-      const date = d.split('/')[1] + '/' + d.split('/')[2];
-      if (!acc[date]) {
-        acc[date] = { date, price: 0 };
+    const dataByMonth = data.reduce<Record<string, { createdAt: string; price: number }>>((acc, item) => {
+      let d = new Date(item.createdAt).toLocaleDateString('fa');
+      const createdAt = d.split('/')[1] + '/' + d.split('/')[2];
+      if (!acc[createdAt]) {
+        acc[createdAt] = { createdAt, price: 0 };
       }
-      acc[date].price += item.price;
+      acc[createdAt].price += item.price;
       return acc;
     }, {});
 
     // تبدیل داده‌ها به فرمت مناسب برای Victory
     const formatted = Object.values(dataByMonth).map(item => ({
-      date: item.date,
+      createdAt: item.createdAt,
       price: item.price
     }));
 
@@ -73,7 +73,7 @@ export const VictoryTooltip = ({ data = [] }: { data?: DataItem[] }) => {
     >
       <VictoryBar
         data={formattedData}
-        x="date"
+        x="createdAt"
         y="price"
         style={{
           data: { fill: fillColor, opacity: '0.4' },
@@ -95,7 +95,7 @@ export const VictoryTooltip = ({ data = [] }: { data?: DataItem[] }) => {
 
       <VictoryAxis
         tickLabelComponent={<VictoryLabel dy={0} dx={10} angle={55} />}
-        tickValues={formattedData.map(d => d.date)}
+        tickValues={formattedData.map(d => d.createdAt)}
         // tickLabelProps={{ angle: 45 }}
         style={chartTheme}
       />

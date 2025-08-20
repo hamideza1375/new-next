@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const ticket = await TicketModel.findOne({ 
       _id: params.id, 
       user: _user.userId 
-    }).select('imageUrl title message userSeen date');
+    }).select('imageUrl title message userSeen createdAt');
 
     return NextResponse.json(ticket || {});
   } catch (error) {

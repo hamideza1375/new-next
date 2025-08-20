@@ -6,17 +6,16 @@ import { existsSync } from 'fs';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import authAdminRoutes from '@/middleware/authAdminRoutes';
+import errorHandling from '@/middleware/errorHandling';
 
 interface Params {
     id: string;
 }
 
 // تابع GET برای دریافت دسته‌بندی بر اساس شناسه
-export async function GET(
-    req: NextRequest,
-    { params }: { params: Params }
+export async function GET(req: NextRequest,{ params }: { params: Params }
 ): Promise<NextResponse> {
-    try {
+    return errorHandling(async () => {
         await dbConnect();
         await authAdminRoutes();
         
@@ -30,21 +29,15 @@ export async function GET(
         }
 
         return NextResponse.json(category);
-    } catch (error: any) {
-        console.error('خطا در دریافت دسته‌بندی:', error);
-        return NextResponse.json(
-            { error: error?.message || 'خطای سرور' },
-            { status: error?.status || 500 }
-        );
-    }
+    })
 }
 
+
 // تابع PUT برای به‌روزرسانی دسته‌بندی
-export async function PUT(
-    req: NextRequest,
-    { params }: { params: Params }
+export async function PUT(req: NextRequest,{ params }: { params: Params }
 ): Promise<NextResponse> {
-    try {
+       return errorHandling(async () => {
+
         await dbConnect();
         await authAdminRoutes();
 
@@ -79,38 +72,24 @@ export async function PUT(
             }
 
             const buffer = Buffer.from(await file.arrayBuffer());
-            const filename = `${Date.now().toString(32)}${Math.floor(
-                Math.random() * 89999 + 10000
-            )}_${file.name.replace(/\s+/g, '_')}`;
-            
-            const uploadPath = path.join(
-                process.cwd(), 
-                'assets/uploads/product/', 
-                filename
-            );
+            const filename: string = crypto.randomUUID() + '.' + file.type.slice(6)
 
-            try {
+            
+            const uploadPath = path.join(process.cwd(), 'assets/uploads/product/', filename);
+
+            
                 await writeFile(uploadPath, buffer);
                 
                 // حذف فایل قبلی اگر وجود داشته باشد
-                const oldImagePath = path.join(
-                    process.cwd(), 
-                    'assets/uploads/product/', 
-                    category.imageUrl
-                );
+                const oldImagePath = path.join(process.cwd(), 'assets/uploads/product/', 
+                category.imageUrl);
                 
                 if (existsSync(oldImagePath)) {
                     await unlink(oldImagePath);
                 }
                 
                 category.imageUrl = filename;
-            } catch (error) {
-                console.error('خطا در مدیریت فایل‌ها:', error);
-                return NextResponse.json(
-                    { error: 'خطا در ذخیره تصویر' },
-                    { status: 500 }
-                );
-            }
+            
         }
 
         category.title = title;
@@ -120,13 +99,7 @@ export async function PUT(
             { data: category },
             { status: 200 }
         );
-    } catch (error: any) {
-        console.error('خطا در به‌روزرسانی دسته‌بندی:', error);
-        return NextResponse.json(
-            { error: error?.message || 'خطای سرور' },
-            { status: error?.status || 500 }
-        );
-    }
+    });
 }
 
 // تابع DELETE برای حذف دسته‌بندی (غیرفعال شده)

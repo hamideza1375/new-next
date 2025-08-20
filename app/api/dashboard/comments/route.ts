@@ -4,7 +4,7 @@ import { ProductsModel } from '@/models/ProductModel';
 import dbConnect from '@/utils/dbConnect';
 
 export async function GET() {
-    errorHandling(async()=>{
+   return errorHandling(async()=>{
    
         // اتصال به دیتابیس
         await dbConnect();
@@ -48,9 +48,7 @@ export async function GET() {
         ]).exec();
 
         // بازگشت نظرات به صورت JSON
-        return new Response(JSON.stringify(comments), {
-            headers: { 'Content-Type': 'application/json' }
-        });
+        return Response.json(comments);
     });
 
 }

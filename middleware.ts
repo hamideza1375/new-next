@@ -20,16 +20,11 @@ export async function middleware(req: NextRequest) {
    try {
       const response = NextResponse.next();
 
-      await block(req);
-
       await _userAgent(req)
+      await block(req);
+      if ((await preventInvalidPhotos(req)) === 'MAX_LENGTH') return NextResponse.json('حجم تصویر نباید بزرگ تر از ۲ مگابایت باشد', { status: 413 });
 
-      // بررسی حجم تصویر
-      if ((await preventInvalidPhotos(req)) === 'MAX_LENGTH') {
-         return NextResponse.json('حجم تصویر نباید بزرگ تر از ۲ مگابایت باشد', { status: 413 });
-      }
-
-      // بررسی مسیرهای مختلف و اعمال احراز هویت
+      // route handler
       if (req.nextUrl.pathname.startsWith('/api/dashboard')) {
          await authMainAdmin(response);
          return response;
@@ -43,11 +38,11 @@ export async function middleware(req: NextRequest) {
       }
 
       // client
-      else if (req.nextUrl.pathname.startsWith('/dashboard1')) {
+      else if (req.nextUrl.pathname.startsWith('/dashboard')) {
          const { error } = (await authMainAdminClient()) as AuthError;
          if (error) return forbidden();
          return response;
-      }  else if (req.nextUrl.pathname.startsWith('/profile1')) {
+      }  else if (req.nextUrl.pathname.startsWith('/profile')) {
          const { error } = (await authUserClient()) as AuthError;
          if (error) return NextResponse.redirect(new URL('/sign', req.url));
          return response;

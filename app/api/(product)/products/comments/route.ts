@@ -1,6 +1,7 @@
 import authUserRoutes from '@/middleware/authUserRoutes';
 import errorHandling from '@/middleware/errorHandling';
 import { IProduct, ProductsModel } from '@/models/ProductModel';
+import { CustomError } from '@/utils/CustomError';
 import dbConnect from '@/utils/dbConnect';
 import getUser from '@/utils/getUser';
 import { NextRequest } from 'next/server';
@@ -28,22 +29,30 @@ interface User {
     // Add other properties if needed
 }
 
-export async function GET(request: NextRequest) {
-    try {
-        await dbConnect();
-        const searchParams = request.nextUrl.searchParams;
-        
-        const product = await ProductsModel.findOne({ _id: searchParams.get('productID') })
-            .slice('comments', -100)
-            .populate('comments.user', '-_id email')
-            .lean()
-            .then((product) => product?.comments.reverse() || []);
 
-        return Response.json(product);
-    } catch (error) {
-        console.log(error);
-        return Response.json([]);
-    }
+export async function GET(request: NextRequest) {
+  try {
+    await dbConnect();
+    const searchParams = request.nextUrl.searchParams;
+    const productID = searchParams.get('productID');
+    const page = parseInt(searchParams.get('page') || '1');
+    const commentsPerPage = 10;
+
+    // محاسبه تعداد کامنت‌هایی که باید skip شوند
+    const skipCount = (page - 1) * commentsPerPage;
+
+    const comments = await ProductsModel.findOne({ _id: productID }, {
+      comments: { $slice: [ - (skipCount + commentsPerPage), commentsPerPage ] }
+    })
+    .populate('comments.user', '-_id email')
+    .lean()
+    .then((product) => product?.comments.reverse() || []);
+
+    return Response.json(comments || { comments: [] });
+  } catch (error) {
+    console.log(error);
+    return Response.json({ comments: [] }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -57,6 +66,8 @@ export async function POST(request: NextRequest) {
         const { message, rating } = await request.json();
 
         const product = await ProductsModel.findById(searchParams.get('productID')) as IProduct;
+
+        if(!product) throw new CustomError({message:'محصول مورد نظر پیدا نشد', status:404})
 
         product.comments.push({
             message,

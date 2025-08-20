@@ -23,10 +23,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             return NextResponse.json('بعدا دوباره امتحان کنید', { status: 400 });
         }
 
+
         // اگر پروفایل قبلا داشته باشد آن را حذف می کند
-        const profileImage = await ProfileModel.findOne({ user: _user.userId });
-        if (profileImage) {
-            const imagePath = path.join(process.cwd(), 'assets/uploads/profile/' + profileImage.imageUrl);
+        const profile = await ProfileModel.findOne({ user: _user.userId });
+        if (profile) {
+            const imagePath = path.join(process.cwd(), 'assets/uploads/profile/' + profile.imageUrl);
             if (existsSync(imagePath)) {
                 unlinkSync(imagePath);
             }
@@ -39,7 +40,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const buffer: Buffer = Buffer.from(await image.arrayBuffer());
         
         // نام فایل را ایجاد می کنیم
-        const filename: string = Date.now().toString(32) + '' + Math.floor(Math.random() * 99999 + 10000) + '_' + image.name.replace(/\s+/g, '_');
+        const filename: string = crypto.randomUUID() + '.' + image.type.slice(6)
+
         
         // تصویر را در سرور ذخیره می کنیم
         const uploadPath = path.join(process.cwd(), 'assets/uploads/profile/', filename);

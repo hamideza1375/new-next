@@ -15,10 +15,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         await dbConnect(); // اتصال به دیتابیس
         await authAdminRoutes(); // احراز هویت ادمین
         const tickets = await TicketModel.find() // جستجوی تیکت‌ها در دیتابیس
-            .sort({ date: -1 }) // مرتب‌سازی تیکت‌ها بر اساس تاریخ به صورت نزولی
+            .sort({ createdAt: -1 }) // مرتب‌سازی تیکت‌ها بر اساس تاریخ به صورت نزولی
             .skip(skipItems) // رد کردن آیتم‌های محاسبه شده
             .limit(pageSize) // محدود کردن تعداد آیتم‌ها به تعداد مشخص شده
-            .select('title message adminSeen date'); // انتخاب فیلدهای مورد نظر
+            .select('title message adminSeen createdAt'); // انتخاب فیلدهای مورد نظر
         
         return NextResponse.json(tickets); // بازگرداندن تیکت‌ها به صورت JSON
     } catch (error: any) {

@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
         const filename = await optimizeImage(image);
 
         const newTicket = await TicketModel.create({
-            date: new Date(),
             title: title,
             message: message,
             user: _user.userId,
@@ -41,8 +40,8 @@ export async function GET(req: NextRequest) {
         const _user = getUser(req);
 
         const tickets = await TicketModel.find({ user: _user.userId })
-            .sort({ date: -1 })
-            .select('title userSeen message date');
+            .sort({ createdAt: -1 })
+            .select('title userSeen message createdAt');
 
         return Response.json(tickets);
     });

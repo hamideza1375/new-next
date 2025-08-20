@@ -4,33 +4,54 @@ import errorHandling from '@/middleware/errorHandling';
 import { NextRequest } from 'next/server';
 import mongoose from 'mongoose';
 import getUser from '@/utils/getUser';
+import authAdminRoutes from '@/middleware/authAdminRoutes';
+import { CustomError } from '@/utils/CustomError';
 
-export async function POST(req:NextRequest, { params }:{params:{id:string}}) {
-    return errorHandling(async()=>{
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  return errorHandling(async()=>{
     await dbConnect();
     const { message, to } = await req.json();
 
+    await authAdminRoutes();
     const _user = getUser(req);
 
-    if(!_user.isAdmin) return Response.json('شما مجوز این کار را ندارید', {status:429})
-
-    await ProductsModel.updateOne(
-        { 'comments._id': params.id },
-        {
-            $push: {
-                'comments.$.answer': {
-                    username: _user.username,
-                    message,
-                    // to: to
-                }
-            }
+    const updateResult = await ProductsModel.updateOne(
+      { 'comments._id': params.id },
+      {
+        $push: {
+          'comments.$.answer': {
+            username: _user.username,
+            message,
+            // to: to
+          }
         }
+      }
     );
-    
-    const updatedComment = await ProductsModel.findOne({ 'comments._id': params.id }) as IProduct;
-    return Response.json({ message: 'ساخته شد', dt: updatedComment?.comments.id(params.id)?.answer });
-})
+
+    if (!updateResult.matchedCount) {
+      return Response.json(
+        { message: 'کامنت مورد نظر یافت نشد' },
+        { status: 404 }
+      );
+    }
+
+    const product = await ProductsModel.findOne({ 'comments._id': params.id }) as IProduct;
+
+    if (!product) {
+      return Response.json(
+        { message: 'محصول یافت نشد' },
+        { status: 404 }
+      );
+    }
+
+    return Response.json({ 
+      message: 'ساخته شد', 
+      dt: product?.comments.id(params.id)?.answer 
+    });
+
+  });
 }
+
 
 export async function GET(req:NextRequest, { params }:{params:{id:string}}) {
     await dbConnect();
@@ -68,6 +89,8 @@ export async function PUT(req:NextRequest, { params }:{params:{id:string}}) {
         }
     );
 
+    if(!updatedAnswer) return Response.json('کامنت مورد نظر یافت نشد', {status:404})
+
     return Response.json({ message: 'به‌روزرسانی شد', dt: updatedAnswer });
     })
 }
@@ -77,8 +100,7 @@ export async function DELETE(req:NextRequest, { params }:{params:{id:string}}) {
     return errorHandling(async()=>{
     await dbConnect();
 
-    const userHeader = req.headers.get('user');
-    const _user = userHeader && JSON.parse(userHeader);
+    const _user = getUser(req);
 
     if(!_user.isAdmin) return Response.json('شما مجوز این کار را ندارید', {status:429})
 

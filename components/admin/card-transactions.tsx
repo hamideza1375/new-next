@@ -5,7 +5,7 @@ interface TransactionItem {
   name: string;
   picture: string;
   amount: string;
-  date: string;
+  createdAt: string;
 }
 
 const items: TransactionItem[] = [
@@ -13,31 +13,31 @@ const items: TransactionItem[] = [
     name: "اصغر فرهادی",
     picture: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
     amount: "4500 USD",
-    date: "9/20/2021",
+    createdAt: "9/20/2021",
   },
   {
     name: "اکبر هاشمی",
     picture: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
     amount: "4500 USD",
-    date: "9/20/2021",
+    createdAt: "9/20/2021",
   },
   {
     name: "جواد خیابانی",
     picture: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
     amount: "4500 USD",
-    date: "9/20/2021",
+    createdAt: "9/20/2021",
   },
   {
     name: "هاشم آقا",
     picture: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
     amount: "4500 USD",
-    date: "9/20/2021",
+    createdAt: "9/20/2021",
   },
   {
     name: "عزیز خداداد",
     picture: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
     amount: "4500 USD",
-    date: "9/20/2021",
+    createdAt: "9/20/2021",
   },
 ];
 
@@ -75,7 +75,7 @@ export const CardTransactions = () => {
                 <span className="text-success text-xs">{item.amount}</span>
               </div>
               <div>
-                <span className="text-default-500 text-xs">{item.date}</span>
+                <span className="text-default-500 text-xs">{item.createdAt}</span>
               </div>
             </div>
           ))}

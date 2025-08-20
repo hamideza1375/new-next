@@ -1,7 +1,7 @@
 import { VictoryAxis, VictoryBar, VictoryGroup, VictoryLabel } from 'victory';
 
 interface DataItem {
-  date: string;
+  createdAt: string;
   price: number;
 }
 
@@ -28,19 +28,19 @@ export const Steam = ({ data = [] }: SteamProps) => {
   };
 
   // دسته‌بندی داده‌ها بر اساس ماه
-  const dataByMonth = data.reduce<Record<string, { date: string; price: number }>>((acc, item) => {
-    let d = new Date(item.date).toLocaleDateString('fa');
-    const date = d.split('/')[1] + '/' + d.split('/')[2];
-    if (!acc[date]) {
-      acc[date] = { date, price: 0 };
+  const dataByMonth = data.reduce<Record<string, { createdAt: string; price: number }>>((acc, item) => {
+    let d = new Date(item.createdAt).toLocaleDateString('fa');
+    const createdAt = d.split('/')[1] + '/' + d.split('/')[2];
+    if (!acc[createdAt]) {
+      acc[createdAt] = { createdAt, price: 0 };
     }
-    acc[date].price += item.price;
+    acc[createdAt].price += item.price;
     return acc;
   }, {});
 
   // تبدیل داده‌ها به فرمت مناسب برای Victory
   const formattedData = Object.values(dataByMonth).map((item) => ({
-    date: item.date,
+    createdAt: item.createdAt,
     price: item.price,
   }));
 
@@ -63,7 +63,7 @@ export const Steam = ({ data = [] }: SteamProps) => {
     >
       <VictoryBar
         data={formattedData}
-        x="date"
+        x="createdAt"
         y="price"
         // labels=""
         style={{
@@ -93,7 +93,7 @@ export const Steam = ({ data = [] }: SteamProps) => {
 
       <VictoryAxis
         tickLabelComponent={<VictoryLabel dy={0} dx={10} angle={55} />}
-        tickValues={formattedData.map((d) => d.date)}
+        tickValues={formattedData.map((d) => d.createdAt)}
         // tickLabelProps={{ angle: 45 }}
         style={chartTheme}
       />

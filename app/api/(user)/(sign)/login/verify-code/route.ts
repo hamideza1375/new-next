@@ -12,9 +12,9 @@ type RequestBody = {
 
 interface TokenPayload {
   isAdmin: boolean;
-  userId: string;
-  username: string;
-  email: string;
+  userId: string | undefined;
+  username: string | undefined;
+  email: string | undefined;
   products: any[];
 }
 
@@ -33,9 +33,11 @@ export async function POST(req: NextRequest) {
 
     // دریافت ایمیل از کوکی
     const email = cookieStore.get('email')?.value;
+    const username = cookieStore.get('username')?.value;
+    const userId = cookieStore.get('userId')?.value;
 
     // اگر ایمیل وجود نداشته باشد، خطا بازگردانده شود
-    if (!email) {
+    if (!email || !username) {
       return res.json(
         { message: 'لطفاً ابتدا کد تأیید را دریافت کنید' }, 
         { status: 400 }
@@ -50,8 +52,8 @@ export async function POST(req: NextRequest) {
     // ایجاد توکن برای مدیر
     const forToken: TokenPayload = {
       isAdmin: true,
-      userId: email,
-      username: email,
+      userId: userId,
+      username: username,
       email: email,
       products: []
     };
@@ -78,6 +80,8 @@ export async function POST(req: NextRequest) {
     });
 
     cookieStore.delete('email')
+    cookieStore.delete('username')
+    cookieStore.delete('userId')
 
     return response;
   });

@@ -3,65 +3,57 @@ import rateLimit from '@/middleware/rateLimit';
 import sendCode, { checkCode } from '@/middleware/sendCode';
 import { UsersModel } from '@/models/UsersModel';
 import cache from '@/utils/node_cache.js';
-import { ChangePasswordValidator } from '@/validator/SignValidator';
 import { cookies } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 
 interface PostRequestBody {
-  email: string;
-  password: string;
+   email: string;
+   password: string;
 }
 
-
 interface SendCodeResponse {
-    message: string;
+   message: string;
 }
 
 interface PutRequestBody {
-  code: number;
+   code: number;
 }
 
 // type NumericString = `${number}`
 
-
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  return rateLimit(req.url,async () => {
-    const cookieStore = await cookies();
-    
-    // Check if resend time is still active
-    if (cookieStore.get('ResendTime')) {
-      return Response.json(
-        { message: 'تا اتمام سه دقیقه صبر کنید' }, 
-        { status: 429 }
-      );
-    }
+   return rateLimit(req.url, async () => {
+      const cookieStore = await cookies();
 
-    const { email, password }: PostRequestBody = await req.json();
-    await ChangePasswordValidator.validate({ email, password })
-    const user = await UsersModel.findOne({ email }).select('_id').lean();
+      const { email, password }: PostRequestBody = await req.json();
+      await UsersModel.validate({ email, password });
 
-    if (!user) {
-      return Response.json(
-        { message: 'ایمیل وارد شده اشتباه هست' }, 
-        { status: 400 }
-      );
-    }
+      const user = await UsersModel.findOne({ email }).select('_id').lean();
 
-    // Store email and new password in cookies
-    cookieStore.set('email', email, { maxAge: 180 });
-    cookieStore.set('password', password, { maxAge: 180 });
+      if (!user) {
+         return Response.json({ message: 'ایمیل وارد شده اشتباه هست' }, { status: 400 });
+      }
 
-    const response: SendCodeResponse = await sendCode(email, req.url);
+      // Check if resend time is still active
+      if (cookieStore.get('ResendTime')) {
+         return Response.json({ message: 'تا اتمام سه دقیقه صبر کنید' }, { status: 429 });
+      }
 
-    const creationTime = Date.now();
-    const expiresTime = creationTime + 60 * 1000 * 3;
-    cookieStore.set('ResendTime', expiresTime.toString(), { 
-      maxAge: 180,
-      expires: new Date(expiresTime)
-    });
+      // Store email and new password in cookies
+      cookieStore.set('email', email, { maxAge: 180 });
+      cookieStore.set('password', password, { maxAge: 180 });
 
-    return Response.json(response);
-  });
+      const response: SendCodeResponse = await sendCode(email, req.url);
+
+      const creationTime = Date.now();
+      const expiresTime = creationTime + 60 * 1000 * 3;
+      cookieStore.set('ResendTime', expiresTime.toString(), {
+         maxAge: 180,
+         expires: new Date(expiresTime)
+      });
+
+      return Response.json(response);
+   });
 }
 
 /**
@@ -69,53 +61,40 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
  * @param req NextRequest
  */
 export async function PUT(req: NextRequest): Promise<NextResponse> {
-  return errorHandling(async () => {
-    const cookieStore = await cookies();
+   return errorHandling(async () => {
+      const cookieStore = await cookies();
 
-    const { code }: PutRequestBody = await req.json();
-    const email = cookieStore.get('email')?.value;
+      const { code }: PutRequestBody = await req.json();
+      const email = cookieStore.get('email')?.value;
 
-    console.log(cookieStore.get('email'));
-    
+      console.log(cookieStore.get('email'));
 
-    if (!email) {
-      return Response.json(
-        { message: 'لطفاً ابتدا درخواست تغییر رمز را ارسال کنید' },
-        { status: 400 }
-      );
-    }
+      if (!email) {
+         return Response.json({ message: 'لطفاً ابتدا درخواست تغییر رمز را ارسال کنید' }, { status: 400 });
+      }
 
-    // Verify the code
-    await checkCode(email,code);
+      // Verify the code
+      await checkCode(email, code);
 
-    const user = await UsersModel.findOne({ email });
-    if (!user) {
-      return Response.json(
-        { message: 'کاربر یافت نشد' },
-        { status: 404 }
-      );
-    }
+      const user = await UsersModel.findOne({ email });
+      if (!user) {
+         return Response.json({ message: 'کاربر یافت نشد' }, { status: 404 });
+      }
 
-    const newPassword = cookieStore.get('password')?.value;
-    if (!newPassword) {
-      return Response.json(
-        { message: 'لطفاً رمز جدید را ارسال کنید' },
-        { status: 400 }
-      );
-    }
+      const newPassword = cookieStore.get('password')?.value;
+      if (!newPassword) {
+         return Response.json({ message: 'لطفاً رمز جدید را ارسال کنید' }, { status: 400 });
+      }
 
-    user.password = newPassword;
-    await user.save();
+      user.password = newPassword;
+      await user.save();
 
-    // Clean up cookies
-    cookieStore.delete('email');
-    cookieStore.delete('password');
-    cookieStore.delete('ResendTime');
-    cache.del('code' + email);
+      // Clean up cookies
+      cookieStore.delete('email');
+      cookieStore.delete('password');
+      cookieStore.delete('ResendTime');
+      cache.del('code' + email);
 
-    return Response.json(
-      { message: 'رمز شما با موفقیت تغییر کرد' },
-      { status: 200 }
-    );
-  });
+      return Response.json({ message: 'رمز شما با موفقیت تغییر کرد' }, { status: 200 });
+   });
 }

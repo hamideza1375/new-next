@@ -9,7 +9,6 @@ type TicketData = {
     title: string;
     message: string;
     adminSeen: boolean;
-    date: Date;
 };
 
 // تابع GET برای دریافت تعداد تیکت‌های دیده نشده توسط ادمین

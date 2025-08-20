@@ -2,8 +2,10 @@ import authUserRoutes from '@/middleware/authUserRoutes';
 import errorHandling from '@/middleware/errorHandling';
 import { IComment, ProductsModel } from '@/models/ProductModel';
 import { IUser } from '@/models/UsersModel';
+import { CustomError } from '@/utils/CustomError';
 import dbConnect from '@/utils/dbConnect';
-import { NextRequest } from 'next/server';
+import getUser from '@/utils/getUser';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface PopulatedComment extends Omit<IComment, 'user'> {
     user: {
@@ -12,7 +14,8 @@ interface PopulatedComment extends Omit<IComment, 'user'> {
 }
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    await dbConnect();
+return errorHandling(async()=>{
+        await dbConnect();
     
     const product = await ProductsModel.findOne(
         { 'comments._id': params.id }, 
@@ -21,12 +24,16 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     
     const comment = product?.comments?.[0] || {} as Partial<PopulatedComment>;
 
+    if(!Object.keys(comment).length) throw new CustomError({message:'کامنت مورد نظر پیدا نشد', status:404})
+    
+
     const _comment = {
         message: comment.message || '',
         star: comment.rating || 0
     };
 
     return Response.json(_comment);
+})
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
@@ -48,12 +55,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
             return Response.json('کامنت یافت نشد', { status: 404 });
         }
 
-        const userHeader = req.headers.get('user');
-        if (!userHeader) {
-            return Response.json('هدر کاربر وجود ندارد', { status: 400 });
-        }
+        const _user = getUser(req);
 
-        const _user: IUser = JSON.parse(userHeader);
         if (comment.user.email !== _user.email && !_user.isAdmin) {
             return Response.json('شما مجوز این کار را ندارید', { status: 403 });
         }

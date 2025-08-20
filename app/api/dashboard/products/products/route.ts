@@ -1,5 +1,6 @@
 // وارد کردن ماژول‌های مورد نیاز
 import authAdminRoutes from '@/middleware/authAdminRoutes';
+import errorHandling from '@/middleware/errorHandling';
 import { ProductsModel } from '@/models/ProductModel';
 import dbConnect from '@/utils/dbConnect';
 import { writeFileSync } from 'fs';
@@ -20,7 +21,7 @@ interface ProductFormData {
 
 // تابع برای مدیریت درخواست POST
 export async function POST(req: NextRequest): Promise<NextResponse> {
-    try {
+    return errorHandling(async () => {
         // اتصال به دیتابیس
         await dbConnect();
         await authAdminRoutes();
@@ -59,14 +60,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         });
 
         return NextResponse.json({ dt: product, message: {} }, { status: 201 });
-    } catch (error: any) {
-        return NextResponse.json({ error: error?.message }, { status: error?.status || 500 });
-    }
+    })
 }
 
 // تابع برای مدیریت درخواست GET
 export async function GET(req: NextRequest): Promise<NextResponse> {
-    try {
+    return errorHandling(async () => {
         await dbConnect();
         await authAdminRoutes();
 
@@ -75,7 +74,5 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const products = await ProductsModel.find({ categoryId }).sort({ createAt: -1 });
 
         return NextResponse.json(products, { status: 200 });
-    } catch (error: any) {
-        return NextResponse.json({ error: error?.message }, { status: error?.status || 500 });
-    }
+    })
 }

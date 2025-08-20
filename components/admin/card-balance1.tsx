@@ -3,7 +3,7 @@ import { Card, CardBody } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 
 interface Transaction {
-  date: string;
+  createdAt: string;
   price: number;
 }
 
@@ -16,7 +16,7 @@ export const CardBalance1 = ({ data = [] }: CardBalance1Props) => {
 
   useEffect(() => {
     const calculatedTotal = data.reduce((accumulator, currentValue) => {
-      const d = new Date(currentValue.date);
+      const d = new Date(currentValue.createdAt);
       if (d.getTime() >= new Date().getTime() - 60000 * 60 * 24) {
         return accumulator + currentValue.price;
       }

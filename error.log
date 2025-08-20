@@ -1,0 +1,3 @@
+{"message":"Error: ابتدا وارد حساب خود شوید","file":"unknown","line":"unknown","date":"۱۴۰۴/۵/۲۸"}
+{"message":"Error: ابتدا وارد حساب خود شوید","file":"unknown","line":"unknown","date":"۱۴۰۴/۵/۲۸"}
+{"message":"Error: Cast to ObjectId failed for value \"682f515302c76645199ff66\" (type string) at path \"_id\" for model \"category\"","file":"C:\\Users\\rezaa\\Desktop\\new-next\\node_modules\\mongoose\\lib\\schema\\objectId.js","line":"250","date":"۱۴۰۴/۵/۲۹"}
