@@ -1,7 +1,7 @@
 import errorHandling from '@/middleware/errorHandling';
 import { checkCode } from '@/middleware/sendCode';
 import { UsersModel } from '@/models/UsersModel';
-import { SignUpValidator } from '@/validator/SignValidator';
+import { AuthValidator } from '@/validator/AuthValidator';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         await checkCode(email, code);
 
         // Validate input data
-        SignUpValidator.validateSync({ ...body, email });
+        AuthValidator.validateSync({ ...body, email });
         await UsersModel.validate({ ...body, email });
 
         // Check number of existing users

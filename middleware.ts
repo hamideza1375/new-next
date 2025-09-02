@@ -44,15 +44,15 @@ export async function middleware(req: NextRequest) {
       }
 
       // client
-      else if (req.nextUrl.pathname.startsWith('/dashboard1')) {
+      else if (req.nextUrl.pathname.startsWith('/dashboard')) {
          const { error } = (await authMainAdminClient()) as AuthError;
          if (error) return forbidden();
          return response;
-      }  else if (req.nextUrl.pathname.startsWith('/profile1')) {
+      }  else if (req.nextUrl.pathname.startsWith('/profile')) {
          const { error } = (await authUserClient()) as AuthError;
-         if (error) return NextResponse.redirect(new URL('/sign', req.url));
+         if (error) return NextResponse.redirect(new URL('/login', req.url));
          return response;
-      } else if (req.nextUrl.pathname.startsWith('/sign')) {
+      } else if (req.nextUrl.pathname.startsWith('/login')) {
          const { error } = (await authSignClient()) as AuthError;
          if (error) return NextResponse.redirect(new URL('/profile', req.url));
          return response;
